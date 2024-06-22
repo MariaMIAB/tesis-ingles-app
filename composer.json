@@ -6,11 +6,16 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "jeroennoten/laravel-adminlte": "^3.11",
         "laravel/framework": "^11.9",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "laravel/ui": "^4.5",
+        "masbug/flysystem-google-drive-ext": "^2.3",
+        "spatie/laravel-backup": "^8.8"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
+        "laravel-lang/common": "^6.3",
         "laravel/pint": "^1.13",
         "laravel/sail": "^1.26",
         "mockery/mockery": "^1.6",
