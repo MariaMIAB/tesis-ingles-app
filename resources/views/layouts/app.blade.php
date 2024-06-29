@@ -15,6 +15,7 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @yield('css')
 </head>
 <body>
     <div id="app">
@@ -32,7 +33,13 @@
                     <ul class="navbar-nav me-auto">
 
                     </ul>
-
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            @if(auth()->user()->can('ver-menu-panel'))
+                                <a class="nav-link" href="{{ route('panel') }}">{{ __('Dashboard') }}</a>
+                            @endif
+                        </li>
+                    </ul>                    
                     <!-- Right Side Of Navbar -->
                     <ul class="navbar-nav ms-auto">
                         <!-- Authentication Links -->
