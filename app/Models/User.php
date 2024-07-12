@@ -7,11 +7,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasMedia
 {
-    use HasFactory, Notifiable,HasRoles;
-
+    use HasFactory,Notifiable,HasRoles,InteractsWithMedia;
     /**
      * The attributes that are mass assignable.
      *
@@ -45,9 +47,29 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function registerMediaCollections(): void {
+        $this
+            ->addMediaCollection('avatar')
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                $this
+                    ->addMediaConversion('small')
+                    ->crop('crop-center', 50, 50)
+                    ->sharpen(10);
+                $this
+                    ->addMediaConversion('medium')
+                    ->crop('crop-center', 250, 250);
+            });
+    }
+
     public function adminlte_image()
     {
-        return "https://picsum.photos/300/300";
+        if ($this->hasMedia('avatars')) {
+            return $this->getFirstMediaUrl('avatars', 'thumb');
+        } else {
+            return asset('storage/imagenes/sistema/user.png');
+        }
     }
 
     public function adminlte_desc()
@@ -65,4 +87,5 @@ class User extends Authenticatable
     {
         return 'profile/username';
     }
+
 }

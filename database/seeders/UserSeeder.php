@@ -18,12 +18,12 @@ class UserSeeder extends Seeder
             $user->assignRole('Estudiante');
         });
         User::factory()->create([
-            'name' => 'Maria Isabel',
+            'name' => 'Maria Isabel Alvarez Barriga',
             'email' => 'mari@mailinator.com',
             'password' => Hash::make('12345678'),
         ])->assignRole('Administrador');
         User::factory()->create([
-            'name' => 'Jose Eduardo',
+            'name' => 'Jose Eduardo Patiño Cuellar',
             'email' => 'edu@mailinator.com',
             'password' => Hash::make('12345678'),
         ])->assignRole('Estudiante');
