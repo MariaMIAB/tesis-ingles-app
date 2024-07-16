@@ -9,8 +9,9 @@
 @section('content')
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ route('users.update', $user) }}" enctype="multipart/form-data">
                 @csrf
+                @method('PUT')
                 <div>
                     @include('admin.users.partials._form')
                     <br>
@@ -49,5 +50,12 @@
 @stop
 
 @section('js')
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            $(".custom-file-input").on("change", function() {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            })
+        });
+    </script>
 @stop

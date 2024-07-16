@@ -378,6 +378,21 @@ return [
                 ],
             ],
         ],
+       /* 'Drop' => [
+            'active' => true,
+            'files' => [
+                [
+                    'type' => 'css',
+                    'asset' => false,
+                    'location' => 'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css',
+                ],
+                [
+                    'type' => 'js',
+                    'asset' => false,
+                    'location' => 'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js',
+                ],
+            ],
+        ],*/
         'Select2' => [
             'active' => false,
             'files' => [

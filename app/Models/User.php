@@ -47,26 +47,43 @@ class User extends Authenticatable implements HasMedia
             'password' => 'hashed',
         ];
     }
-
-    public function registerMediaCollections(): void {
-        $this
-            ->addMediaCollection('avatar')
-            ->singleFile()
-            ->registerMediaConversions(function (Media $media) {
-                $this
-                    ->addMediaConversion('small')
-                    ->crop('crop-center', 50, 50)
-                    ->sharpen(10);
-                $this
-                    ->addMediaConversion('medium')
-                    ->crop('crop-center', 250, 250);
-            });
+   
+        public function getAvatarUrlAttribute()
+    {
+        $url = $this->getFirstMediaUrl('avatar');
+        $relativePath = parse_url($url, PHP_URL_PATH);
+        return $relativePath;
     }
 
+    public function getAvatarThumbUrlAttribute()
+    {
+        $url = $this->getFirstMediaUrl('avatar', 'thumb');
+        $relativePath = parse_url($url, PHP_URL_PATH);
+        return $relativePath;
+    }
+
+    public function getAvatarMediumUrlAttribute()
+    {
+        $url = $this->getFirstMediaUrl('avatar', 'medium');
+        $relativePath = parse_url($url, PHP_URL_PATH);
+        return $relativePath;
+    }
+
+    public function registerMediaConversions(Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+              ->width(100)
+              ->height(100);
+
+        $this->addMediaConversion('medium')
+              ->width(300)
+              ->height(300);
+    }
+    
     public function adminlte_image()
     {
-        if ($this->hasMedia('avatars')) {
-            return $this->getFirstMediaUrl('avatars', 'thumb');
+        if ($this->hasMedia('avatar')) {
+            return $this->avatar_thumb_url;
         } else {
             return asset('storage/imagenes/sistema/user.png');
         }

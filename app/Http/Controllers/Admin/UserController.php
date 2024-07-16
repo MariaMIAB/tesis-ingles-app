@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\StoreRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
-
 
 class UserController extends Controller
 {
@@ -40,23 +40,25 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
-            'avatar' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'role' => 'required|in:Administrador,Profesor,Estudiante'
-        ]);
-        $user = User::create($request->all());
-        if($request->hasFile('avatar') && $request->file('avatar')->isValid()){
-            $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
-        }
-        $user->assignRole($request->input('role'));
+        $validatedData = $request->validated();
+        $user = User::create($validatedData);
 
-        return redirect()->route('users.show',[$user->id]);
+        if ($request->has('role')) {
+            $user->assignRole($request->input('role'));
+        }
+
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $user
+                ->addMediaFromRequest('avatar')
+                ->toMediaCollection('avatar');
+        }
+
+        return redirect()->route('users.show', [$user->id]);
     }
+
+
 
 
     /**
@@ -64,9 +66,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $avatarUrl = $user->getFirstMediaUrl('avatar');
-        $ava = str_replace(['http://', 'https://', 'localhost/'], '', $avatarUrl);
-        return view('admin.users.show', compact('user','ava'));
+        return view('admin.users.show', compact('user'));
     }
 
     /**
@@ -83,23 +83,26 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, User $user)
     {
-        $user = User::findOrFail($id);
-
-        $user->name = $request->input('name');
-        $user->email = $request->input('email');
-        $user->password = bcrypt($request->input('password'));
-
-        if ($request->hasFile('avatar')) {
-            $user->addMediaFromRequest('avatar')->toMediaCollection('avatars');
+        $validatedData = $request->validated();
+        
+        $user->update($validatedData);
+    
+        if ($request->has('role')) {
+            $newRole = $request->input('role');
+            if (!$user->hasRole($newRole)) {
+                $user->syncRoles($newRole);
+            }
         }
-
-        $user->assignRole($request->input('role'));
-
-        $user->save();
-
-        return view('admin.users.index');
+    
+        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            $user
+                ->addMediaFromRequest('avatar')
+                ->toMediaCollection('avatar');
+        }
+    
+        return redirect()->route('users.show', [$user->id]);
     }
 
     /**

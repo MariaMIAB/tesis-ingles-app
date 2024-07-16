@@ -16,13 +16,20 @@
             <div class="row d-flex align-items-center">
                 <div class="col-6">
                     @if ($user->hasMedia('avatar'))
-                    <img src="{{ url($ava) }}" alt="Avatar del usuario" width="200" class="img-fluid rounded-circle shadow border border-success mt-3 mb-3">
+                        <img src="{{ asset($user->avatar_medium_url) }}"  alt="Imagen Medium" width="200" class="img-fluid rounded-circle shadow border border-success mt-3 mb-3">
                     @else
-                    <img src="{{ asset('storage/imagenes/sistema/user.png') }}" alt="Avatar por defecto" width="120" class="img-fluid rounded-circle shadow border border-success mt-3 mb-3">
-                    @endif                      
+                        <img src="{{ asset('storage/imagenes/sistema/user.png') }}" alt="Avatar por defecto" width="120" class="img-fluid rounded-circle shadow border border-success mt-3 mb-3">
+                    @endif
                     <p><strong>Nombre:</strong> {{ $user->name }}</p>
                     @if ($user->roles->isNotEmpty())
-                        <p><strong>Rol:</strong> {{ $user->roles->first()->name }}</p>
+                        @php
+                            $role = $user->roles->first();
+                        @endphp
+                        @if ($role)
+                            <p><strong>Rol:</strong> {{ $role->name }}</p>
+                        @else
+                            <p><strong>No tiene Rol</strong></p>
+                        @endif
                     @else
                         <p><strong>No tiene Rol</strong></p>
                     @endif

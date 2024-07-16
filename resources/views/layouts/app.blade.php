@@ -58,7 +58,7 @@
                         @else
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    <img src="{{ Auth::user()->getMedia('avatars')->first() ? Auth::user()->getMedia('avatars')->first()->getUrl('thumb') : asset('storage/imagenes/sistema/user.png') }}" alt="Imagen de perfil" width="40" class="mr-2">
+                                    <img src="{{ Auth::user()->avatar_thumb_url ? asset(Auth::user()->avatar_thumb_url) : asset('storage/imagenes/sistema/user.png') }}" alt="Imagen de perfil" width="40" class="mr-2 rounded-circle">
                                     {{ Auth::user()->name }}
                                 </a>                                                                                          
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
