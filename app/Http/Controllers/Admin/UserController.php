@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -55,7 +56,7 @@ class UserController extends Controller
                 ->toMediaCollection('avatar');
         }
 
-        return redirect()->route('users.show', [$user->id]);
+        return redirect()->route('users.show', [$user->id])->with('success', 'Usuario guardado correctamente.');
     }
 
 
@@ -97,10 +98,18 @@ class UserController extends Controller
         }
     
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+            
+            if ($user->getMedia('avatar')->count() > 0) {
+                $user->getMedia('avatar')->each(function ($mediaItem) {
+                    $mediaItem->delete();
+                });
+            }
+        
             $user
                 ->addMediaFromRequest('avatar')
                 ->toMediaCollection('avatar');
         }
+        
     
         return redirect()->route('users.show', [$user->id]);
     }
@@ -111,6 +120,6 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('user.index')->with('eliminar', 'ok');
+        return redirect()->route('users.index')->with('success', 'El Usuario a sido eliminado con exito');
     }
 }

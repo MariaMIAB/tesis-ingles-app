@@ -18,6 +18,7 @@
                     <tr>
                         <th scope="col">Id</th>
                         <th scope="col">Nombre</th>
+                        <th scope="col">Opciones</th>
                     </tr>
                 </thead>
             </table>
@@ -40,6 +41,7 @@
                 columns : [
                     { data: 'id' , name:'id' },
                     { data: 'name', name: 'name'},
+                    { data: 'btn', orderable: false, searchable: false }   
                 ],
                 language: {
                     "decimal": "",

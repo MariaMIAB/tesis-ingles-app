@@ -43,6 +43,12 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
+        
+        'mediadisk' => [
+            'driver' => 'local',
+            'root' => public_path('mediadisk'),
+            'url' => env('APP_URL').'/mediadisk',
+        ],
 
         's3' => [
             'driver' => 's3',
@@ -61,9 +67,7 @@ return [
             'clientId' => env('GOOGLE_DRIVE_CLIENT_ID'),
             'clientSecret' => env('GOOGLE_DRIVE_CLIENT_SECRET'),
             'refreshToken' => env('GOOGLE_DRIVE_REFRESH_TOKEN'),
-            'folder' => env('GOOGLE_DRIVE_FOLDER'), // without folder is root of drive or team drive
-            //'teamDriveId' => env('GOOGLE_DRIVE_TEAM_DRIVE_ID'),
-            //'sharedFolderId' => env('GOOGLE_DRIVE_SHARED_FOLDER_ID'),
+            'folder' => env('GOOGLE_DRIVE_FOLDER'), 
         ],
 
     ],

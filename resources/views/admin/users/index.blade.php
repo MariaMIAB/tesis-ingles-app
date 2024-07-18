@@ -73,4 +73,16 @@
             });
         });
     </script>
+    //swit alert
+    @if(session('success'))
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        </script>
+   @endif
 @stop

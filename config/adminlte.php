@@ -308,6 +308,11 @@ return [
             'icon' => 'fas fa-fw fa-home',
         ],
         [
+            'text' => 'Panel de Backup',
+            'route' => 'backups.index',
+            'icon' => 'fas fa-fw fa-home',
+        ],
+        [
             'text' => 'Panel de Usuarios',
             'route' => 'users.index',
             'icon' => 'fas fa-fw fa-users',
