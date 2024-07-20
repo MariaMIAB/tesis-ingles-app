@@ -15,30 +15,51 @@
         <div class="card-body">
             <h2>Permisos del Rol {{ $role->name }}</h2>
             <hr>
-            <ul class="list-group">
-                <div class="row">
-                    <div class="col-6"> 
-                        @foreach ($permissions as $permission)
-                            <li class="list-group-item">
-                                <span class="badge bg-success">{{ $permission->id }}</span>
-                                <span>{{ $permission->name }}</span>
-                            </li>
-                         @endforeach
-                    </div>
+            @if ($permissions->isEmpty())
+                <div class="alert alert-warning" role="alert">
+                    No se encontraron permisos para este rol.
                 </div>
-            </ul>
+            @else
+                <ul class="list-group">
+                    <div class="row">
+                        <div class="col-4"> 
+                            @foreach ($permissions as $permission)
+                                <li class="list-group-item align-items-center bg-light text-dark p-2">
+                                    <span class="badge bg-success text-white">{{ $permission->id }} :</span>
+                                    <span>{{ $permission->name }}</span>
+                                </li>
+                             @endforeach
+                        </div>
+                    </div>
+                </ul>
+            @endif
         </div>
     </div>
 @stop
 
 @section('css')
     <style>
-        /* Estilos adicionales para la lista */
         .list-group-item {
-            border: none;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            padding: 0.5rem;
+            transition: transform 0.2s, background-color 0.2s;
         }
-        .badge {
-            font-size: 0.8rem;
+
+        .list-group-item:hover {
+            transform: scale(1.05);
+            background-color: #e9ecef;
+        }
+
+        .list-group-item .badge {
+            font-size: 0.85rem;
+            padding: 0.3em 0.6em;
+        }
+
+        .list-group-item span {
+            font-weight: bold;
+            margin-left: 5px;
         }
     </style>
 @stop

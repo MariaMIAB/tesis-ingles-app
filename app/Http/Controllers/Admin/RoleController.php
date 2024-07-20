@@ -66,11 +66,12 @@ class RoleController extends Controller
     public function update(UpdateRequest $request, Role $role)
     {
         $validatedData = $request->validated();
-        $permissions = $validatedData['permissions'];
+        $permissions = $validatedData['permissions'] ?? [];
         $role->permissions()->sync($permissions);
     
         return redirect()->route('roles.show', [$role->id])->with('success', 'Permisos actualizados correctamente.');
     }
+    
 
     /**
      * Remove the specified resource from storage.
