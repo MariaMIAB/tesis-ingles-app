@@ -20,7 +20,6 @@
     @endif
 @stop
 
-
 @section('content')
     @yield('content_body')
 @stop

@@ -305,7 +305,12 @@ return [
         [
             'text' => 'Panel de Administracion',
             'route' => 'panel',
-            'icon' => 'fas fa-fw fa-home',
+            'icon' => 'fas fa-fw fa-wrench',
+        ],
+        [
+            'text' => 'Sistema de los Usuarios',
+            'route' => 'home',
+            'icon' => 'fas fa-fw fa-users',
         ],
         [
             'text' => 'Panel de Backup',
@@ -321,6 +326,11 @@ return [
             'text' => 'Panel de Roles',
             'route' => 'roles.index',
             'icon' => 'fas fa-fw fa-solid fa-key',
+        ],
+        [
+            'text' => 'Panel de Eventos',
+            'route' => 'events.index',
+            'icon' => 'fas fa-fw fa-calendar',
         ],
         [
             'type' => 'fullscreen-widget',
@@ -383,21 +393,16 @@ return [
                 ],
             ],
         ],
-       /* 'Drop' => [
+        'Ckeditor' => [
             'active' => true,
             'files' => [
                 [
-                    'type' => 'css',
-                    'asset' => false,
-                    'location' => 'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css',
-                ],
-                [
                     'type' => 'js',
                     'asset' => false,
-                    'location' => 'https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js',
+                    'location' => '//cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js',
                 ],
             ],
-        ],*/
+        ],
         'Select2' => [
             'active' => false,
             'files' => [

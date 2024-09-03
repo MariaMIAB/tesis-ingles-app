@@ -11,7 +11,7 @@
 @stop
 
 @section('content')
-
+    <div id='calendar'></div>
 @stop
 
 @section('css')

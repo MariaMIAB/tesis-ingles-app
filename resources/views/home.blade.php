@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.user.app')
 
 @section('content')
     <div class="course-container cardboard">
@@ -20,46 +20,52 @@
             <img src="storage/imagenes/sistema/ingles.png" alt="Imagen del curso">
         </div>
     </div>
+  
 @endsection
 
 @section('css')
-<style>
-    .course-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 40px;
-        margin: 40px; /* Agrega un margen al contenedor */
-    }
-    .course-text {
-        flex: 1;
-        padding-right: 20px;
-    }
-    .course-image img {
-        max-width: 100%;
-        height: auto;
-    }
-    .cardboard {
-        background-color: #8cf594;
-        border: 1px solid #ccc;
-        padding: 30px;
-        border-radius: 30px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    h1, h2, h3 {
-        font-weight: bold; /* Grosor en negrita */
-    }
-    p {
-        font-weight: normal;
-        font-size: 18px;
-        line-height: 1.5; 
-    }
-    hr {
-        border: none;
-        height: 2px;
-        background-color: white;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-</style>
+    <style>
+        .course-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            margin: 40px; /* Agrega un margen al contenedor */
+        }
+        .course-text {
+            flex: 1;
+            padding-right: 20px;
+        }
+        .course-image img {
+            max-width: 100%;
+            height: auto;
+        }
+        .cardboard {
+            background-color: #8cf594;
+            border: 1px solid #ccc;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            font-weight: bold; /* Grosor en negrita */
+        }
+        p {
+            font-weight: normal;
+            font-size: 18px;
+            line-height: 1.5; 
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+    </style>
 @endsection
+
+@section('js')
+@endsection
+
+
 
