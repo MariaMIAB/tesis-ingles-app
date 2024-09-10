@@ -102,17 +102,6 @@
 
 @section('css')
     <style>
-        .img-highlight {
-            border: 2px solid #10c245;
-            border-radius: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .img-highlight:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px #10c245;
-        }
         .form-control {
             border-radius: 5px;
             transition: border-color 0.2s ease;

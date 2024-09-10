@@ -7,9 +7,11 @@
         <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
     </form>
 </div>
+
 <script>
     $('.formulario-eliminar').submit(function(e) {
         e.preventDefault();
+        console.log('Formulario de eliminación enviado');
         Swal.fire({
             title: '¿Estás seguro?',
             text: '¡No podrás revertir esto!',
@@ -21,9 +23,11 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
+                console.log('Confirmado');
                 this.submit();
             }
         });
     });
 </script>
+
 

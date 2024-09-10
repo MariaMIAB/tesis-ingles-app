@@ -16,7 +16,7 @@
             <div>
                 <a href="{{ route('users.create') }}" class="btn btn-success"><i class="fas fa-plus"></i> Usuario</a>
             </div>   
-            <table id="table-users" class="table-condensed table-striped table-bordered table-hover table-condensed" style="width:100%">
+            <table id="table-users" class="table-striped table-bordered table-hover" style="width:100%">
                 <thead>
                     <tr>
                         <th scope="col">Id</th>
@@ -29,47 +29,32 @@
             </table>
         </div>
     </div>
-
 @stop
 
 @section('css')
 @stop
 
 @section('js')
+    <script src="{{ asset('js/datatable-language.js') }}"></script>
     <script>
-        //tabla
-        $(document).ready(function(){
-        $('#table-users').DataTable({
+        $(document).ready(function() {
+            $('#table-users').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: 'api/dbusers',
-                columns : [
-                    { data: 'id' , name:'id' },
-                    { data: 'name', name: 'name'},
-                    { data: 'email', name: 'email'},
-                    { data: 'created_at', name: 'created_at' },
-                    { data: 'btn', orderable: false, searchable: false }   
-                ],
-                language: {
-                    "decimal": "",
-                    "emptyTable": "No hay información",
-                    "info": "Mostrando _START_ a _END_ de _TOTAL_ Entradas",
-                    "infoEmpty": "Mostrando 0 to 0 of 0 Entradas",
-                    "infoFiltered": "(Filtrado de _MAX_ total entradas)",
-                    "infoPostFix": "",
-                    "thousands": ",",
-                    "lengthMenu": "Mostrar _MENU_ Entradas",
-                    "loadingRecords": "Cargando...",
-                    "processing": "Procesando...",
-                    "search": "Buscar:",
-                    "zeroRecords": "Sin resultados encontrados",
-                    "paginate": {
-                        "first": "Primero",
-                        "last": "Ultimo",
-                        "next": ">>",
-                        "previous": "<<"
+                ajax: {
+                    url: 'api/dbusers',
+                    data: function(d) {
+                        d.type = 'type1';
                     }
                 },
+                columns: [
+                    { data: 'id', name: 'id' },
+                    { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
+                    { data: 'created_at', name: 'created_at' },
+                    { data: 'btn', orderable: false, searchable: false }
+                ],
+                language: datatableLanguage,
             });
         });
     </script>

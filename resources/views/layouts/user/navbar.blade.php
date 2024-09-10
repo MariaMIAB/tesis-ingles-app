@@ -8,7 +8,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto">
-                @if(auth()->user()->can('ver-menu-panel'))
+                @if(auth()->user()->hasDirectOrRolePermission('ver-menu-panel'))
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('panel') }}">{{ __('Dashboard') }}</a>
                     </li>

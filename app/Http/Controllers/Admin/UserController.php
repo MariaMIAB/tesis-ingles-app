@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -19,15 +19,28 @@ class UserController extends Controller
         ->rawColumns(['btn'])
         ->toJson();
     }
+    
+    
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        
         return view('admin.users.index');
     }
 
+    public function seeDeleted()
+    {
+        $trash = User::onlyTrashed()->get();
+        return view('admin.users.trash', compact('trash'));
+    }
+
+    public function restore($id)
+    {
+        $usuario = User::withTrashed()->find($id);
+        $usuario->restore();
+        return redirect()->route('trash.deleted')->with('success', 'Usuario restaurado exitosamente.');
+    }
     /**
      * Show the form for creating a new resource.
      */
@@ -88,31 +101,35 @@ class UserController extends Controller
     {
         $validatedData = $request->validated();
         
-        $user->update($validatedData);
-    
-        if ($request->has('role')) {
-            $newRole = $request->input('role');
-            if (!$user->hasRole($newRole)) {
-                $user->syncRoles($newRole);
+        try {
+            $user->update($validatedData);
+        
+            if ($request->has('role')) {
+                $newRole = $request->input('role');
+                if (!$user->hasRole($newRole)) {
+                    $user->syncRoles($newRole);
+                }
             }
-        }
-    
-        if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+        
+            if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
+                
+                if ($user->getMedia('avatar')->count() > 0) {
+                    $user->getMedia('avatar')->each(function ($mediaItem) {
+                        $mediaItem->delete();
+                    });
+                }
             
-            if ($user->getMedia('avatar')->count() > 0) {
-                $user->getMedia('avatar')->each(function ($mediaItem) {
-                    $mediaItem->delete();
-                });
+                $user
+                    ->addMediaFromRequest('avatar')
+                    ->toMediaCollection('avatar');
             }
-        
-            $user
-                ->addMediaFromRequest('avatar')
-                ->toMediaCollection('avatar');
+            
+            return redirect()->route('users.show', [$user->id])->with('success', 'User updated successfully!');
+        } catch (\Exception $e) {
+            return redirect()->route('users.edit', [$user->id])->with('error', 'El Usuario a sido actualizado con exito.');
         }
-        
-    
-        return redirect()->route('users.show', [$user->id]);
     }
+
 
     /**
      * Remove the specified resource from storage.

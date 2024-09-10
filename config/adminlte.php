@@ -295,7 +295,7 @@ return [
     |
     */
 
-    'menu' => [
+            'menu' => [
         // Navbar items:
         [
             'type' => 'navbar-search',
@@ -303,29 +303,45 @@ return [
             'topnav_right' => true,
         ],
         [
-            'text' => 'Panel de Administracion',
+            'type' => 'fullscreen-widget',
+            'topnav_right' => true,
+        ],
+        [
+            'header' => 'PANELES',
+            'classes' => 'text-primary font-weight-bold text-uppercase',
+        ],
+        [
+            'text' => 'Administración',
             'route' => 'panel',
             'icon' => 'fas fa-fw fa-wrench',
         ],
         [
-            'text' => 'Sistema de los Usuarios',
+            'text' => 'Usuarios',
             'route' => 'home',
             'icon' => 'fas fa-fw fa-users',
         ],
         [
-            'text' => 'Panel de Backup',
-            'route' => 'backups.index',
-            'icon' => 'fas fa-fw fa-home',
+            'header' => 'LISTAS Y GESTIÓN',
+            'classes' => 'text-success font-weight-bold text-uppercase',
         ],
         [
-            'text' => 'Panel de Usuarios',
+            'text' => 'Usuarios',
             'route' => 'users.index',
             'icon' => 'fas fa-fw fa-users',
         ],
         [
-            'text' => 'Panel de Roles',
+            'text' => 'Roles',
             'route' => 'roles.index',
             'icon' => 'fas fa-fw fa-solid fa-key',
+        ],
+        [
+            'header' => 'SEGURIDAD Y RECUPERACIÓN',
+            'classes' => 'text-danger font-weight-bold text-uppercase',
+        ],
+        [
+            'text' => 'Papelera',
+            'route' => 'trash.deleted',
+            'icon' => 'fas fa-fw fa-trash',
         ],
         [
             'text' => 'Panel de Eventos',
@@ -333,15 +349,13 @@ return [
             'icon' => 'fas fa-fw fa-calendar',
         ],
         [
-            'type' => 'fullscreen-widget',
-            'topnav_right' => true,
+            'text' => 'Panel de Backup',
+            'route' => 'backups.index',
+            'icon' => 'fas fa-fw fa-home',
         ],
-        // Sidebar items:
-       /* [
-            'type' => 'sidebar-menu-search',
-            'text' => 'search',
-        ],*/
     ],
+
+
 
     /*
     |--------------------------------------------------------------------------

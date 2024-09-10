@@ -9,12 +9,13 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\MediaLibrary\HasMedia;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class User extends Authenticatable implements HasMedia
 {
-    use HasFactory,Notifiable,HasRoles,InteractsWithMedia;
+    use HasFactory,Notifiable,HasRoles,InteractsWithMedia, SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
@@ -35,7 +36,8 @@ class User extends Authenticatable implements HasMedia
         'password',
         'remember_token',
     ];
-
+    
+    protected $dates = ['deleted_at'];
     /**
      * Get the attributes that should be cast.
      *
@@ -48,8 +50,22 @@ class User extends Authenticatable implements HasMedia
             'password' => 'hashed',
         ];
     }
-   
-        public function getAvatarUrlAttribute()
+    public function hasDirectOrRolePermission($permission)
+    {
+        if ($this->hasPermissionTo($permission)) {
+            return true;
+        }
+
+        foreach ($this->roles as $role) {
+            if ($role->hasPermissionTo($permission)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function getAvatarUrlAttribute()
     {
         $url = $this->getFirstMediaUrl('avatar');
         $relativePath = parse_url($url, PHP_URL_PATH);
@@ -106,5 +122,15 @@ class User extends Authenticatable implements HasMedia
         $userId = Auth::id();
         return route('users.show', ['user' => $userId]);
 
+    }
+    public function hasPermissionTo($permission, $guardName = null)
+    {
+        // Verificar si el usuario tiene el permiso directamente revocado
+        if ($this->permissions->contains('name', $permission)) {
+            return true;
+        }
+
+        // Verificar si el usuario tiene el permiso a través de roles
+        return $this->roles->flatMap->permissions->contains('name', $permission);
     }
 }

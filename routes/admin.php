@@ -22,11 +22,15 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
         'roles' => RoleController::class,
         'events'=> EventController::class,
     ]);
-   
+
+
+    Route::get('/trash/deleted', [UserController::class, 'seeDeleted'])->name('trash.deleted');
+    Route::patch('/trash/restore/{id}', [UserController::class, 'restore'])->name('trash.restore');
+
     //rutas de tablas
     Route::get('api/dbusers', [UserController::class, 'datatables']);
     Route::get('api/dbroles', [RoleController::class, 'datatables']);
-
+    
     //rutas del backup
     Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
     Route::post('/backups/create', [BackupController::class, 'create'])->name('backups.create');

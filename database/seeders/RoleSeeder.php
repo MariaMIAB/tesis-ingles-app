@@ -16,8 +16,11 @@ class RoleSeeder extends Seeder
     {
         $role1 = Role::create(['name'=>'Administrador']);
         $role2 = Role::create(['name'=>'Profesor']);
-        $role3 = Role::create(['name'=>'Estudiante']);  
-        
+        $role3 = Role::create(['name'=>'Estudiante']);
+        $role4 = Role::create(['name'=>'Contenido-cancelados']);
+        $role5 = Role::create(['name'=>'Exanenes-cancelados']);
+        $role6 = Role::create(['name'=>'Actividades-canelados']);
+        $role7 = Role::create(['name'=>'Inabilitado']);
 
         //permisos para acceder al panel de administracion
         Permission::create(['name'=>'ver-menu-panel'])->syncRoles([$role1]);

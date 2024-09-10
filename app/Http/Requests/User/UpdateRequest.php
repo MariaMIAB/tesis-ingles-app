@@ -30,7 +30,7 @@ class UpdateRequest extends FormRequest
                 Rule::unique('users')->ignore($this->route('user')->id)
             ],
             'avatar' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'role' => 'required|in:Administrador,Profesor,Estudiante'
+            'role' => 'required|in:Administrador,Profesor,Estudiante,Inabilitado,Exanenes-cancelados,Actividades-canelados'
         ];
     }
 }

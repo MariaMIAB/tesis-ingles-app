@@ -63,7 +63,32 @@
                             </nav>
                         @endif
                     </header>
-
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    @if(session('error'))
+                        <script>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Tu cuenta ha sido inhabilitada',
+                                confirmButtonColor: '#d33',
+                                customClass: {
+                                    popup: 'colored-toast'
+                                }
+                            });
+                        </script>
+                    @endif
+                    <style>
+                        .swal2-popup.colored-toast {
+                            border: 1px solid #f5c6cb;
+                        }
+                        .swal2-title {
+                            color: #721c24;
+                        }
+                        .swal2-content {
+                            color: #721c24;
+                        }
+                    </style>
+                    
                     <main class="mt-6">
                         <div class="grid gap-6 lg:grid-cols-2 lg:gap-8">
                             <a
