@@ -22,8 +22,7 @@ class UpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-
-        return [
+        $rules = [
             'name' => 'required|max:255',
             'email' => [
                 'required', 'email', 'max:255',
@@ -32,5 +31,11 @@ class UpdateRequest extends FormRequest
             'avatar' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'role' => 'required|in:Administrador,Profesor,Estudiante,Inabilitado,Exanenes-cancelados,Actividades-canelados'
         ];
+
+        if ($this->input('role') === 'Estudiante') {
+            $rules['year'] = 'required|exists:years,id';
+        }
+
+        return $rules;
     }
 }

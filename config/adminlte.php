@@ -335,6 +335,11 @@ return [
             'icon' => 'fas fa-fw fa-solid fa-key',
         ],
         [
+            'text' => 'Periodos Escolares',
+            'route' => 'years.index',
+            'icon' => 'fas fa-fw fa-solid fa-calendar',
+        ],
+        [
             'header' => 'SEGURIDAD Y RECUPERACIÓN',
             'classes' => 'text-danger font-weight-bold text-uppercase',
         ],
@@ -346,7 +351,7 @@ return [
         [
             'text' => 'Panel de Eventos',
             'route' => 'events.index',
-            'icon' => 'fas fa-fw fa-calendar',
+            'icon' => 'fas fa-fw fa-calendar-plus',
         ],
         [
             'text' => 'Panel de Backup',

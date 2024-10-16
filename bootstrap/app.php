@@ -22,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
             ->group(base_path('routes/admin.php'));
         },
     )
+
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -29,6 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
     })
+
+ 
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

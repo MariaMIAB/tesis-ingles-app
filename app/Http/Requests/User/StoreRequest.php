@@ -19,15 +19,21 @@ class StoreRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-    public function rules(): array
+    public function rules()
     {
-        return [
+        $rules = [
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:8|confirmed',
             'avatar' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'role' => 'required|in:Administrador,Profesor,Estudiante'
+            'role' => 'required|in:Administrador,Profesor,Estudiante,Inabilitado,Exanenes-cancelados,Actividades-canelados'
         ];
+    
+        if ($this->input('role') === 'Estudiante') {
+            $rules['year'] = 'required|exists:years,id';
+        }
+    
+        return $rules;
     }
 
        /**

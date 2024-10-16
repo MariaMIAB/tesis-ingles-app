@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
+use App\Models\Year;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
@@ -14,12 +15,14 @@ class UserController extends Controller
 {
 
     public function datatables(){
-        return DataTables::eloquent(User::query())
-        ->addColumn('btn', 'admin.users.partials.btn')
-        ->rawColumns(['btn'])
-        ->toJson();
+        return DataTables::eloquent(User::with('roles')->select('users.*'))
+            ->addColumn('role', function (User $user) {
+                return $user->roles->pluck('name')->implode(', ');
+            })
+            ->addColumn('btn', 'admin.users.partials.btn')
+            ->rawColumns(['btn'])
+            ->toJson();
     }
-    
     
     /**
      * Display a listing of the resource.
@@ -48,8 +51,10 @@ class UserController extends Controller
     {
         $user = new User();
         $roles = Role::get();
-        return view('admin.users.create', compact('user', 'roles'));
+        $years = Year::all(); // Obtener todos los años
+        return view('admin.users.create', compact('user', 'roles', 'years'));
     }
+    
 
     /**
      * Store a newly created resource in storage.
@@ -58,22 +63,29 @@ class UserController extends Controller
     {
         $validatedData = $request->validated();
         $user = User::create($validatedData);
-
+    
         if ($request->has('role')) {
             $user->assignRole($request->input('role'));
         }
-
+    
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
             $user
                 ->addMediaFromRequest('avatar')
                 ->toMediaCollection('avatar');
         }
-
+    
+        if ($user->hasRole('Estudiante')) {
+            $yearId = $request->input('current_year') ? Year::where('name', now()->year)->first()->id : $request->input('year');
+            $year = Year::with('semesters')->findOrFail($yearId);
+    
+            $user->years()->attach($year->id);
+    
+            $semester = $year->semesters->random();
+            $user->semesters()->attach($semester->id);
+        }
+    
         return redirect()->route('users.show', [$user->id])->with('success', 'Usuario guardado correctamente.');
     }
-
-
-
 
     /**
      * Display the specified resource.
@@ -90,7 +102,12 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         $roles = Role::get();
-        return view('admin.users.edit', compact('user', 'roles'));
+        $years = Year::all(); // Obtener todos los años
+
+        // Obtener el año actual del usuario
+        $currentYear = $user->years()->first();
+
+        return view('admin.users.edit', compact('user', 'roles', 'years', 'currentYear'));
     }
 
 
@@ -100,17 +117,17 @@ class UserController extends Controller
     public function update(UpdateRequest $request, User $user)
     {
         $validatedData = $request->validated();
-        
+
         try {
             $user->update($validatedData);
-        
+
             if ($request->has('role')) {
                 $newRole = $request->input('role');
                 if (!$user->hasRole($newRole)) {
                     $user->syncRoles($newRole);
                 }
             }
-        
+
             if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
                 
                 if ($user->getMedia('avatar')->count() > 0) {
@@ -123,12 +140,24 @@ class UserController extends Controller
                     ->addMediaFromRequest('avatar')
                     ->toMediaCollection('avatar');
             }
-            
-            return redirect()->route('users.show', [$user->id])->with('success', 'User updated successfully!');
+
+            // Asignar año y semestre si el rol es "Estudiante"
+            if ($user->hasRole('Estudiante')) {
+                $yearId = $request->input('current_year') ? Year::where('name', now()->year)->first()->id : $request->input('year');
+                $year = Year::with('semesters')->findOrFail($yearId);
+
+                $user->years()->sync([$year->id]);
+
+                $semester = $year->semesters->random();
+                $user->semesters()->sync([$semester->id]);
+            }
+
+            return redirect()->route('users.show', [$user->id])->with('success', 'Usuario actualizado correctamente.');
         } catch (\Exception $e) {
-            return redirect()->route('users.edit', [$user->id])->with('error', 'El Usuario a sido actualizado con exito.');
+            return redirect()->route('users.edit', [$user->id])->with('error', 'Hubo un error al actualizar el usuario.');
         }
     }
+
 
 
     /**

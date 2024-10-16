@@ -50,20 +50,13 @@ class User extends Authenticatable implements HasMedia
             'password' => 'hashed',
         ];
     }
+    
     public function hasDirectOrRolePermission($permission)
     {
-        if ($this->hasPermissionTo($permission)) {
-            return true;
-        }
-
-        foreach ($this->roles as $role) {
-            if ($role->hasPermissionTo($permission)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+        return $this->hasPermissionTo($permission) || $this->roles->contains(function ($role) use ($permission) {
+            return $role->hasPermissionTo($permission);
+        });
+    }    
 
     public function getAvatarUrlAttribute()
     {
@@ -108,13 +101,11 @@ class User extends Authenticatable implements HasMedia
 
     public function adminlte_desc()
     {
-        $user = auth()->user();
-        if ($user && $user->roles->count() > 0) {
-            $rol = $user->roles->first()->name;
-            return $rol;
-        } else {
-            return "Rol no definido";
+        if ($this->roles->isNotEmpty()) {
+            return $this->roles->first()->name;
         }
+    
+        return "Rol no definido";
     }
 
     public function adminlte_profile_url()
@@ -125,12 +116,22 @@ class User extends Authenticatable implements HasMedia
     }
     public function hasPermissionTo($permission, $guardName = null)
     {
-        // Verificar si el usuario tiene el permiso directamente revocado
         if ($this->permissions->contains('name', $permission)) {
             return true;
         }
 
-        // Verificar si el usuario tiene el permiso a través de roles
         return $this->roles->flatMap->permissions->contains('name', $permission);
+    }
+
+     // Relación muchos a muchos con Year
+    public function years()
+    {
+        return $this->belongsToMany(Year::class, 'student_year', 'student_id', 'year_id');
+    }
+
+    // Relación muchos a muchos con Semester
+    public function semesters()
+    {
+        return $this->belongsToMany(Semester::class, 'student_semester', 'student_id', 'semester_id');
     }
 }

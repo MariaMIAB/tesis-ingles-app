@@ -234,5 +234,14 @@
     "Whoops!": "¡Ups!",
     "Yes": "Sí",
     "You are logged in!": "¡Usted está conectado!",
-    "You are receiving this email because we received a password reset request for your account.": "Ha recibido este mensaje porque se solicitó un restablecimiento de contraseña para su cuenta."
+    "You are receiving this email because we received a password reset request for your account.": "Ha recibido este mensaje porque se solicitó un restablecimiento de contraseña para su cuenta.",
+    "presentation": "Presentación",
+    "welcome_message": "¡Bienvenidos a mi curso virtual! Mi nombre es Maria Isabel Alvarez Barriga y seré su instructor/a durante estas próximas semanas/meses. Tengo 23 años de experiencia en inglés y estoy muy emocionado/a de compartir mi conocimiento con ustedes.",
+    "course_purpose": "Propósito del curso",
+    "course_purpose_message": "Este curso ha sido diseñado para enseñarles inglés de manera efectiva y práctica. Durante este tiempo, trabajaremos juntos para que puedan adquirir las habilidades y conocimientos necesarios para tener éxito en este campo.",
+    "expectations": "Expectativas",
+    "expectations_message": "Espero que dediquen tiempo y esfuerzo a este curso para poder aprovecharlo al máximo. Les pediré que completen [cantidad] de tareas, que participen activamente en las discusiones y que estén comprometidos con su propio aprendizaje.",
+    "communication": "Comunicación",
+    "communication_message": "La comunicación es clave en cualquier curso, por lo que estaré disponible para responder cualquier pregunta que puedan tener. Pueden comunicarse conmigo a través de [correo electrónico, plataforma de aprendizaje, etc.] y les enviaré información sobre el curso a través de [correo electrónico, plataforma de aprendizaje, etc.].",
+    "course_image_alt": "Imagen del curso"
 }

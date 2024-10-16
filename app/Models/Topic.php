@@ -12,11 +12,22 @@ class Topic extends Model
     protected $fillable = [
         'topic_name',
         'topic_description',
-        'quarter_id',
+        'semester_id',  // Asegúrate de que coincida con el campo en la migración
     ];
 
-    /*public function quarter()
+    public function semester()
     {
-        return $this->belongsTo(Quarter::class);
-    }*/
+        return $this->belongsTo(Semester::class);
+    }
+
+    public function likedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'topic_likes', 'topic_id', 'user_id');
+    }
+
+    public function viewedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'topic_views', 'topic_id', 'user_id');
+    }
 }
+

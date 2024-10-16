@@ -3,10 +3,10 @@
         <a class="navbar-brand" href="{{ url('/') }}">
             SISTEMA DE INGLES
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent1" aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent1">
             <ul class="navbar-nav me-auto">
                 @if(auth()->user()->hasDirectOrRolePermission('ver-menu-panel'))
                     <li class="nav-item">
@@ -29,7 +29,11 @@
                 @else
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                            <img src="{{ Auth::user()->avatar_thumb_url ? asset(Auth::user()->avatar_thumb_url) : asset('storage/imagenes/sistema/user.png') }}" alt="Imagen de perfil" width="40" class="mr-2 rounded-circle">
+                            <img src="{{ Auth::user()->avatar_thumb_url ? asset(Auth::user()->avatar_thumb_url) : asset('storage/imagenes/sistema/user.png') }}" 
+                                 srcset="{{ asset('storage/imagenes/sistema/user-small.png') }} 480w, 
+                                         {{ asset('storage/imagenes/sistema/user.png') }} 800w" 
+                                 sizes="(max-width: 600px) 480px, 800px" 
+                                 alt="Imagen de perfil" width="40" class="mr-2 rounded-circle">
                             {{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
@@ -45,13 +49,15 @@
                     </li>
                 @endguest
             </ul>
-            <button id="loadCalendarBtn" class="btn btn-primary ms-3" data-toggle="modal" data-target="#calendarModal">
-                <i class="fas fa-calendar-alt"></i>
-            </button>
         </div>
+        <button id="loadCalendarBtn" class="btn btn-primary ms-3" data-toggle="modal" data-target="#calendarModal">
+            <i class="fas fa-calendar-alt"></i>
+        </button>
     </div>
 </nav>
+
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+
 <!-- Modal -->
 <div class="modal fade" id="calendarModal" tabindex="-1" role="dialog" aria-labelledby="calendarModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -71,6 +77,7 @@
 
 <!-- Mensaje -->
 <div id="tooltip-container" style="position: absolute; display: none; background: #333; color: #fff; padding: 5px; border-radius: 3px; z-index: 1000;"></div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         $('#calendarModal').on('shown.bs.modal', function () {
@@ -116,7 +123,6 @@
         });
     });
 </script>
-
 
 <style>
     .custom-close {
@@ -185,4 +191,11 @@
     .tooltip.bs-tooltip-right .arrow::before {
         border-right-color: #333; /* Color de la flecha */
     }
-</style>
+    .language-select {
+          padding: 10px;
+          font-size: 16px;
+          border-radius: 5px;
+          border: 1px solid #ccc;
+          background-color: #f9f9f9;
+      }
+</style> 
