@@ -29,5 +29,10 @@ class Topic extends Model
     {
         return $this->belongsToMany(User::class, 'topic_views', 'topic_id', 'user_id');
     }
+
+    public function contents()
+    {
+        return $this->hasMany(Content::class);
+    }
 }
 

@@ -340,6 +340,11 @@ return [
             'icon' => 'fas fa-fw fa-solid fa-calendar',
         ],
         [
+            'text' => 'Temas',
+            'route' => 'topics.index',
+            'icon' => 'fas fa-fw fa-solid fa-book',
+        ],
+        [
             'header' => 'SEGURIDAD Y RECUPERACIÓN',
             'classes' => 'text-danger font-weight-bold text-uppercase',
         ],

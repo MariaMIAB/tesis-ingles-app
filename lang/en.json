@@ -241,5 +241,6 @@
     "expectations_message": "I expect you to dedicate time and effort to this course to make the most of it. I will ask you to complete [number] of tasks, actively participate in discussions, and be committed to your own learning.",
     "communication": "Communication",
     "communication_message": "Communication is key in any course, so I will be available to answer any questions you may have. You can contact me via [email, learning platform, etc.] and I will send you information about the course through [email, learning platform, etc.].",
-    "course_image_alt": "Course Image"
+    "course_image_alt": "Course Image",
+    "ENGLISH_SYSTEM": "ENGLISH SYSTEM"
 }

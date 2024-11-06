@@ -1,30 +1,30 @@
 @extends('layouts.user.app')
 
 @section('content')
-    <div>
-        <select id="languageSwitcher">
-            <option value="en" {{ session('locale') == 'en' ? 'selected' : '' }}>English</option>
-            <option value="es" {{ session('locale') == 'es' ? 'selected' : '' }}>Español</option>
-        </select>
-    </div>
-    <div class="course-container cardboard">
-        <div class="course-text">
-            <h3>{{ __('presentation') }}</h3>
-            <hr>
-            <p>{{ __('welcome_message') }}</p>
-            <h3>{{ __('course_purpose') }}</h3>
-            <hr>
-            <p>{{ __('course_purpose_message') }}</p>
-            <h3>{{ __('expectations') }}</h3>
-            <hr>
-            <p>{{ __('expectations_message') }}</p>
-            <h3>{{ __('communication') }}</h3>
-            <hr>
-            <p>{{ __('communication_message') }}</p>
-        </div>
-        <div class="course-image">
-            <img src="storage/imagenes/sistema/ingles.png" alt="{{ __('course_image_alt') }}">
-        </div>
+    <div class="py-12"> 
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8"> 
+            <div id="main-container" class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+                <div class="course-container cardboard">
+                    <div class="course-text">
+                        <h3>{{ __('presentation') }}</h3>
+                        <hr>
+                        <p>{{ __('welcome_message') }}</p>
+                        <h3>{{ __('course_purpose') }}</h3>
+                        <hr>
+                        <p>{{ __('course_purpose_message') }}</p>
+                        <h3>{{ __('expectations') }}</h3>
+                        <hr>
+                        <p>{{ __('expectations_message') }}</p>
+                        <h3>{{ __('communication') }}</h3>
+                        <hr>
+                        <p>{{ __('communication_message') }}</p>
+                    </div>
+                    <div class="course-image">
+                        <img src="storage/imagenes/sistema/ingles.png" alt="{{ __('course_image_alt') }}">
+                    </div>
+                </div>
+            </div> 
+        </div> 
     </div>
 @endsection
 

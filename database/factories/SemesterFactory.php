@@ -21,7 +21,7 @@ class SemesterFactory extends Factory
             'name' => $this->faker->randomElement(['Primer Semestre', 'Segundo Semestre', 'Tercer Semestre']),
             'start_date' => $this->faker->date,
             'end_date' => $this->faker->date,
-            'year_id' => Year::factory(),
+            'year_id' => Year::inRandomOrder()->first()->id, // Selecciona un año existente aleatorio
         ];
     }
 }

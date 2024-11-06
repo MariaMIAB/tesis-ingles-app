@@ -243,5 +243,7 @@
     "expectations_message": "Espero que dediquen tiempo y esfuerzo a este curso para poder aprovecharlo al máximo. Les pediré que completen [cantidad] de tareas, que participen activamente en las discusiones y que estén comprometidos con su propio aprendizaje.",
     "communication": "Comunicación",
     "communication_message": "La comunicación es clave en cualquier curso, por lo que estaré disponible para responder cualquier pregunta que puedan tener. Pueden comunicarse conmigo a través de [correo electrónico, plataforma de aprendizaje, etc.] y les enviaré información sobre el curso a través de [correo electrónico, plataforma de aprendizaje, etc.].",
-    "course_image_alt": "Imagen del curso"
+    "course_image_alt": "Imagen del curso",
+    "ENGLISH_SYSTEM": "SISTEMA DE INGLES"
+    
 }

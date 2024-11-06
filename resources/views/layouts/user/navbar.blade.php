@@ -1,20 +1,34 @@
 <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
-            SISTEMA DE INGLES
+            {{ __('ENGLISH_SYSTEM') }}
         </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent1" aria-controls="navbarSupportedContent1" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-            <span class="navbar-toggler-icon"></span>
-        </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent1">
             <ul class="navbar-nav me-auto">
                 @if(auth()->user()->hasDirectOrRolePermission('ver-menu-panel'))
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('panel') }}">{{ __('Dashboard') }}</a>
+                        <a class="nav-link {{ request()->routeIs('panel') ? 'active' : '' }}" href="{{ route('panel') }}">{{ __('Dashboard') }}</a>
                     </li>
                 @endif
-            </ul>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">{{ __('Home') }}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('topicsu.index') ? 'active' : '' }}" href="{{ route('topicsu.index') }}">{{ __('Topics') }}</a>
+                </li>
+            </ul>                      
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item d-flex align-items-center">
+                    <button id="loadCalendarBtn" class="btn btn-primary" data-toggle="modal" data-target="#calendarModal">
+                        <i class="fas fa-calendar-alt"></i>
+                    </button>
+                </li>
+                <li class="nav-item d-flex align-items-center">
+                    <select id="languageSwitcher" class="form-select ms-3">
+                        <option value="en" {{ session('locale') == 'en' ? 'selected' : '' }}>English</option>
+                        <option value="es" {{ session('locale') == 'es' ? 'selected' : '' }}>Español</option>
+                    </select>
+                </li>
                 @guest
                     @if (Route::has('login'))
                         <li class="nav-item">
@@ -27,19 +41,19 @@
                         </li>
                     @endif
                 @else
-                    <li class="nav-item dropdown">
-                        <a id="navbarDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                    <li class="nav-item dropdown d-flex align-items-center">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <img src="{{ Auth::user()->avatar_thumb_url ? asset(Auth::user()->avatar_thumb_url) : asset('storage/imagenes/sistema/user.png') }}" 
                                  srcset="{{ asset('storage/imagenes/sistema/user-small.png') }} 480w, 
                                          {{ asset('storage/imagenes/sistema/user.png') }} 800w" 
                                  sizes="(max-width: 600px) 480px, 800px" 
-                                 alt="Imagen de perfil" width="40" class="mr-2 rounded-circle">
+                                 alt="Imagen de perfil" width="40" class="rounded-circle" style="margin-right: 10px;">
                             {{ Auth::user()->name }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
-                                             document.getElementById('logout-form').submit();">
+                                         document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
                             </a>
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -50,11 +64,10 @@
                 @endguest
             </ul>
         </div>
-        <button id="loadCalendarBtn" class="btn btn-primary ms-3" data-toggle="modal" data-target="#calendarModal">
-            <i class="fas fa-calendar-alt"></i>
-        </button>
     </div>
 </nav>
+
+
 
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
 
@@ -198,4 +211,26 @@
           border: 1px solid #ccc;
           background-color: #f9f9f9;
       }
+      .nav-link.active {
+        position: relative;
+    }
+
+    .nav-link.active::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 2px;
+        bottom: 0;
+        left: 0;
+        background-color: #007bff; /* Cambia el color aquí */
+        visibility: visible;
+        transform: scaleX(1);
+        transition: all 0.3s ease-in-out 0s;
+    }
+
+    .nav-link::after {
+        visibility: hidden;
+        transform: scaleX(0);
+    }
 </style> 
+

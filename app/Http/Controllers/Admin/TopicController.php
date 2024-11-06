@@ -5,19 +5,34 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Topic\StoreRequest;
 use App\Http\Requests\Topic\UpdateRequest;
+use App\Models\Content;
 use App\Models\Semester;
 use App\Models\Topic;
+use App\Models\Year;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class TopicController extends Controller
 {
+
+    public function datatables()
+    {
+        $topics = Topic::with('semester')->select('topics.*');
+        
+        return DataTables::eloquent($topics)
+            ->addColumn('semester_name', function (Topic $topic) {
+                return $topic->semester->name;
+            })
+            ->addColumn('btn', 'admin.topics.partials.btn')
+            ->rawColumns(['btn'])
+            ->toJson();
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $topics = Topic::all();
-        return view('admin.topics.index', compact('topics'));
+        return view('admin.topics.index');
     }
 
     /**
@@ -25,8 +40,15 @@ class TopicController extends Controller
      */
     public function create()
     {
-        $semesters = Semester::all();
-        return view('admin.topics.create', compact('semesters'));
+        $topic = new Topic();
+        $years = Year::orderBy('name', 'asc')->get(); // Solo obtenemos los años
+        return view('admin.topics.create', compact('topic', 'years'));
+    }
+    
+    public function getSemestersByYear($yearId)
+    {
+        $semesters = Semester::where('year_id', $yearId)->get();
+        return response()->json($semesters);
     }
 
     /**
@@ -52,12 +74,13 @@ class TopicController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
         $topic = Topic::findOrFail($id);
-        $semesters = Semester::all();
-        return view('admin.topics.edit', compact('topic', 'semesters'));
+        $years = Year::with('semesters')->orderBy('name', 'asc')->get(); // Cargar años con sus semestres
+        return view('admin.topics.edit', compact('topic', 'years'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -67,9 +90,9 @@ class TopicController extends Controller
         $validatedData = $request->validated();
         $topic = Topic::findOrFail($id);
         $topic->update($validatedData);
-
-        return redirect()->route('topics.index')->with('success', 'Topic updated successfully!');
+        return redirect()->route('topics.show', $topic->id)->with('success', 'Tema actualizado correctamente.');
     }
+
 
     /**
      * Remove the specified resource from storage.

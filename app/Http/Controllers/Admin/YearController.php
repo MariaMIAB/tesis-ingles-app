@@ -12,8 +12,6 @@ use Yajra\DataTables\Facades\DataTables;
 
 class YearController extends Controller
 {
-
-
     public function datatables(){
         return DataTables::eloquent(Year::query())
         ->addColumn('btn', 'admin.years.partials.btn')
