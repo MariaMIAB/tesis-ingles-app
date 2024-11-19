@@ -134,4 +134,18 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->belongsToMany(Semester::class, 'student_semester', 'student_id', 'semester_id');
     }
+
+    public function views()
+    {
+        return $this->hasMany(TopicView::class);
+    }
+
+    public function likes()
+    {
+        return $this->hasMany(TopicLike::class);
+    }
 }
+
+
+    
+

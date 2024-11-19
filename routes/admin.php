@@ -10,7 +10,6 @@ use App\Http\Controllers\Admin\YearController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\ContentController;
-use App\Models\Content;
 
 Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
 
@@ -50,4 +49,11 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
     Route::post('/backups/create', [BackupController::class, 'create'])->name('backups.create');
     Route::post('/backups/download', [BackupController::class, 'download'])->name('backups.download');
+    
+    //Ruta de vistas y likes
+    Route::post('/topics/{topic}/view', [TopicController::class, 'storeView'])->name('topics.view');
+    Route::post('/topics/{topic}/like', [TopicController::class, 'storeLike'])->name('topics.like');
+    
+
+
 });

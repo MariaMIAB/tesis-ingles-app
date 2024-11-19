@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Topic\StoreRequest;
 use App\Http\Requests\Topic\UpdateRequest;
-use App\Models\Content;
 use App\Models\Semester;
 use App\Models\Topic;
+use App\Models\TopicLike;
+use App\Models\TopicView;
 use App\Models\Year;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -67,7 +68,7 @@ class TopicController extends Controller
      */
     public function show(string $id)
     {
-        $topic = Topic::findOrFail($id);
+        $topic = Topic::with(['views', 'likes'])->findOrFail($id);
         return view('admin.topics.show', compact('topic'));
     }
 
@@ -103,5 +104,55 @@ class TopicController extends Controller
         $topic->delete();
 
         return redirect()->route('topics.index')->with('success', 'Topic deleted successfully!');
+    }
+
+    public function toggleView(Request $request, $topic_id)
+    {
+        $view = TopicView::where('user_id', $request->user()->id)
+                        ->where('topic_id', $topic_id)
+                        ->first();
+
+        if ($view) {
+            $view->delete();
+            return redirect()->back()->with('success', 'Vista eliminada');
+        } else {
+            TopicView::create([
+                'user_id' => $request->user()->id,
+                'topic_id' => $topic_id,
+            ]);
+            return redirect()->back()->with('success', 'Ver grabado');
+        }
+    }
+
+    public function storeView(Request $request, $topic_id)
+    {
+        $existingView = TopicView::where('user_id', $request->user()->id)->where('topic_id', $topic_id)->first();
+
+        if ($existingView) {
+            $existingView->delete();
+            return redirect()->back()->with('success', 'Visto eliminada');
+        } else {
+            TopicView::create([
+                'user_id' => $request->user()->id,
+                'topic_id' => $topic_id,
+            ]);
+            return redirect()->back()->with('success', 'Visto guardada');
+        }
+    }
+
+    public function storeLike(Request $request, $topic_id)
+    {
+        $existingLike = TopicLike::where('user_id', $request->user()->id)->where('topic_id', $topic_id)->first();
+
+        if ($existingLike) {
+            $existingLike->delete();
+            return redirect()->back()->with('success', 'Me gusta eliminado');
+        } else {
+            TopicLike::create([
+                'user_id' => $request->user()->id,
+                'topic_id' => $topic_id,
+            ]);
+            return redirect()->back()->with('success', 'Me gusta recordado');
+        }
     }
 }

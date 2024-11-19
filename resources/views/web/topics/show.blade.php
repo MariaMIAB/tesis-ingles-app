@@ -3,39 +3,69 @@
 @section('content')
     <div class="topics-container">
         <div class="row">
-            <h1 class="page-title">{{ $topic->topic_name }}</h1>
-            <hr class="custom-hr-title">
+            <div class="container mt-5">
+                <div class="topic-header">
+                    <h1 class="page-title">{{ $topic->topic_name }}</h1>
+                    <div class="buttons ml-auto">
+                        <form action="{{ route('topics.view', $topic->id) }}" method="POST">
+                            @csrf
+                            @if(Auth::user()->views->contains('topic_id', $topic->id))
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            @else
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="fas fa-eye-slash"></i>
+                                </button>
+                            @endif
+                        </form>
+                        <form action="{{ route('topics.like', $topic->id) }}" method="POST">
+                            @csrf
+                            @if(Auth::user()->likes->contains('topic_id', $topic->id))
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-thumbs-up"></i>
+                                </button>
+                            @else
+                                <button type="submit" class="btn btn-secondary">
+                                    <i class="fas fa-thumbs-down"></i>
+                                </button>
+                            @endif
+                        </form>
+                    </div>
+                </div>
+                <hr class="custom-hr-title">
+            </div>
             <p class="page-description">{{ $topic->topic_description }}</p>
             <div class="col-md-7">
                 @foreach($topic->contents as $content)
-                        <div class="card card-dm">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-10">
-                                        <h5 class="card-title content-title">{{ $content->title }}</h5>
-                                    </div>
-                                    <div class="col-2"> 
-                                        <audio id="audio-player-{{ $content->id }}" src="{{ url('/text-to-speech/' . $content->id) }}" type="audio/mpeg"></audio> 
-                                        <button onclick="toggleAudio({{ $content->id }})" id="audio-button-{{ $content->id }}" class="btn btn-primary"> <i class="fas fa-play"></i> </button> 
-                                    </div>
+                    <div class="card card-dm">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-10">
+                                    <h5 class="card-title content-title">{{ $content->title }}</h5>
                                 </div>
-                                <hr class="custom-hr-content">
-                                <div class="row">
-                                    <div class="col-8">
-                                        <p class="card-text">{!! $content->body !!}</p>
-                                    </div>
-                                    <div class="col-4 content-images"> 
-                                        @if ($content->hasMedia('content_images'))
-                                            @foreach($content->getMedia('content_images') as $image)
+                                <div class="col-2">
+                                    <audio id="audio-player-{{ $content->id }}" src="{{ url('/text-to-speech/' . $content->id) }}" type="audio/mpeg"></audio>
+                                    <button onclick="toggleAudio({{ $content->id }})" id="audio-button-{{ $content->id }}" class="btn btn-primary"> <i class="fas fa-play"></i> </button>
+                                </div>
+                            </div>
+                            <hr class="custom-hr-content">
+                            <div class="row">
+                                <div class="col-8">
+                                    <p class="card-text">{!! $content->body !!}</p>
+                                </div>
+                                <div class="col-4 content-images">
+                                    @if ($content->hasMedia('content_images'))
+                                        @foreach($content->getMedia('content_images') as $image)
                                             <img src="{{ $content->first_content_image_url }}" class="content-image" alt="Imagen del Contenido">
-                                            @endforeach
-                                        @else
+                                        @endforeach
+                                    @else
                                         <img src="{{ asset('/storage/imagenes/sistema/alt-de-una-imagen.png') }}" class="content-image" alt="Imagen por defecto">
-                                        @endif
-                                    </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
+                    </div>
                 @endforeach
             </div>
             <div class="col-md-5">
@@ -50,6 +80,9 @@
                         </div>
                     @endforeach
                 </div>
+            </div>
+            <div class="col-md-5">
+                <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atras</a>
             </div>
         </div>
     </div>
@@ -67,6 +100,7 @@
         font-weight: bold;
         color: #007bff;
         text-align: center;
+        flex-grow: 1;
     }
 
     .page-description {
@@ -129,11 +163,11 @@
         -webkit-box-orient: vertical;
     }
 
-    .related-contents { 
-        border-left: 5px solid #007bff; /* Línea de separación */ 
-        padding-left: 20px; 
-        border-radius: 10px 0 0 10px; /* Bordes redondeados en la parte superior izquierda e inferior izquierda */ 
-        background-color: #f8f9fa; /* Añadir un color de fondo para mayor visibilidad */ 
+    .related-contents {
+        border-left: 5px solid #007bff;
+        padding-left: 20px;
+        border-radius: 10px 0 0 10px;
+        background-color: #f8f9fa;
     }
 
     .content-images img {
@@ -165,15 +199,51 @@
     .card-dm {
         transition: transform 0.3s ease-in-out;
     }
+
+    .topic-header {
+        display: flex;
+        align-items: center;
+    }
+
+    .buttons {
+        display: flex;
+        gap: 10px;
+    }
 </style>
 
-<script> function toggleAudio(contentId) { 
-    var audioPlayer = document.getElementById('audio-player-' + contentId); 
-    var audioButton = document.getElementById('audio-button-' + contentId); 
-    if (audioPlayer.paused) { audioPlayer.play(); audioButton.innerHTML = '<i class="fas fa-stop"></i>'; 
+<!-- Include Bootstrap and SweetAlert scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    } else { 
-        audioPlayer.pause(); audioPlayer.currentTime = 0; audioButton.innerHTML = '<i class="fas fa-play"></i>'; 
+<!-- SweetAlert integration -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
+
+@if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Éxito!',
+                text: '{{ session('success') }}',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        });
+    </script>
+@endif
+
+<script>
+    function toggleAudio(contentId) { 
+        var audioPlayer = document.getElementById('audio-player-' + contentId); 
+        var audioButton = document.getElementById('audio-button-' + contentId); 
+        if (audioPlayer.paused) { 
+            audioPlayer.play(); 
+            audioButton.innerHTML = '<i class="fas fa-stop"></i>'; 
+        } else { 
+            audioPlayer.pause(); 
+            audioPlayer.currentTime = 0; 
+            audioButton.innerHTML = '<i class="fas fa-play"></i>'; 
         } 
     } 
-</script> 
+</script>
+

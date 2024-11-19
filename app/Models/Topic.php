@@ -20,19 +20,17 @@ class Topic extends Model
         return $this->belongsTo(Semester::class);
     }
 
-    public function likedByUsers()
-    {
-        return $this->belongsToMany(User::class, 'topic_likes', 'topic_id', 'user_id');
-    }
-
-    public function viewedByUsers()
-    {
-        return $this->belongsToMany(User::class, 'topic_views', 'topic_id', 'user_id');
-    }
-
     public function contents()
     {
         return $this->hasMany(Content::class);
+    }
+
+    public function views() { 
+        return $this->hasMany(TopicView::class); 
+    } 
+    
+    public function likes() { 
+        return $this->hasMany(TopicLike::class); 
     }
 }
 
