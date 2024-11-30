@@ -7,6 +7,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\ElevenLabsController;
+use App\Http\Controllers\Web\ActivityController;
 use App\Http\Controllers\Web\TopicController;
 
 Route::get('/', function () {
@@ -27,6 +28,8 @@ Route::get('lang/{locale}', function ($locale) {
 
 Route::get('/topicsu', [TopicController::class, 'index'])->name('topicsu.index');
 Route::get('/topicsu/{id}', [TopicController::class, 'show'])->name('topicsu.show');
+
+Route::get('/activitiesu/{id}', [ActivityController::class, 'show'])->name('activitiesu.show');
 
 Route::get('/text-to-speech/{contentId}', [ElevenLabsController::class, 'textToSpeech']);
 

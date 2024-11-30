@@ -69,18 +69,29 @@
                 @endforeach
             </div>
             <div class="col-md-5">
+                <h4>Actividades Relacionadas</h4>
                 <div class="related-contents">
-                    @foreach($topic->contents as $content)
-                        <div class="card card-dm">
-                            <div class="card-body">
-                                <h5 class="card-title content-title">{{ $content->title }}</h5>
-                                <hr class="custom-hr-content">
-                                <p class="card-text">{!! $content->body !!}</p>
-                            </div>
+                    @if($topic->activities->isEmpty())
+                    <div class="card card-dm">
+                        <div class="card-body">
+                            <p>No hay actividades.</p>
                         </div>
-                    @endforeach
+                    </div>
+                    @else
+                        @foreach($topic->activities as $activity)
+                            <div class="card card-dm">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ $activity->title }}</h5>
+                                    <hr class="custom-hr-content">
+                                    <p class="card-text">{{ $activity->description }}</p>
+                                    <a href="{{ route('activitiesu.show', $activity->id) }}" class="btn btn-primary ml-2">Ir a la Actividad</a>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
                 </div>
             </div>
+                    
             <div class="col-md-5">
                 <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atras</a>
             </div>
@@ -129,7 +140,7 @@
     }
 
     .card {
-        margin: 20px;
+        margin: 20px 40px; /* Aumentado para separar las tarjetas de los costados */
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
         transition: 0.3s;
         border-radius: 10px;
@@ -218,6 +229,24 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 
+<script>
+    function toggleAudio(contentId) { 
+        var audioPlayer = document.getElementById('audio-player-' + contentId); 
+        var audioButton = document.getElementById('audio-button-' + contentId); 
+        if (audioPlayer.paused) { 
+            audioPlayer.play().then(() => {
+                audioButton.innerHTML = '<i class="fas fa-stop"></i>';
+            }).catch(error => {
+                console.error('Error al reproducir el audio:', error);
+            });
+        } else { 
+            audioPlayer.pause(); 
+            audioPlayer.currentTime = 0; 
+            audioButton.innerHTML = '<i class="fas fa-play"></i>'; 
+        } 
+    } 
+</script>
+
 @if(session('success'))
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -232,18 +261,6 @@
     </script>
 @endif
 
-<script>
-    function toggleAudio(contentId) { 
-        var audioPlayer = document.getElementById('audio-player-' + contentId); 
-        var audioButton = document.getElementById('audio-button-' + contentId); 
-        if (audioPlayer.paused) { 
-            audioPlayer.play(); 
-            audioButton.innerHTML = '<i class="fas fa-stop"></i>'; 
-        } else { 
-            audioPlayer.pause(); 
-            audioPlayer.currentTime = 0; 
-            audioButton.innerHTML = '<i class="fas fa-play"></i>'; 
-        } 
-    } 
-</script>
+
+
 

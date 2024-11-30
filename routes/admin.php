@@ -1,8 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\Admin\EventController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\PanelController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\YearController;
 use App\Http\Controllers\Admin\SemesterController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\ContentController;
+use App\Http\Controllers\Admin\ActivityController;
 
 Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
 
@@ -27,8 +28,10 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
         'years'=> YearController::class,
         'semesters' => SemesterController::class,
         'topics' => TopicController::class,
-        'contents' => ContentController::class
+        'contents' => ContentController::class,
+        'activities'=> ActivityController::class
     ]);
+
     //rutas derividas
     Route::get('topics/{topicId}/contents', [ContentController::class, 'index'])->name('topics.contents.index');
     Route::get('contents/create/{topic_id}', [ContentController::class, 'create'])->name('contents.create');
@@ -43,6 +46,7 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     Route::get('api/dbroles', [RoleController::class, 'datatables']);
     Route::get('api/dbyears', [YearController::class, 'datatables']);
     Route::get('api/dbtopics', [TopicController::class, 'datatables']);
+    Route::get('api/dbactivities', [ActivityController::class, 'datatables']);
     Route::get('api/dbcontents/{id}', [ContentController::class, 'datatables'])->name('contents.datatables');
 
     //rutas del backup
@@ -53,7 +57,4 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     //Ruta de vistas y likes
     Route::post('/topics/{topic}/view', [TopicController::class, 'storeView'])->name('topics.view');
     Route::post('/topics/{topic}/like', [TopicController::class, 'storeLike'])->name('topics.like');
-    
-
-
 });

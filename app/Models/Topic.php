@@ -4,15 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Topic extends Model
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
         'topic_name',
         'topic_description',
-        'semester_id',  // Asegúrate de que coincida con el campo en la migración
+        'semester_id',
     ];
 
     public function semester()
@@ -31,6 +32,10 @@ class Topic extends Model
     
     public function likes() { 
         return $this->hasMany(TopicLike::class); 
+    }
+
+    public function activities() { 
+        return $this->hasMany(Activity::class); 
     }
 }
 

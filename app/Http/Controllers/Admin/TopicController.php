@@ -33,8 +33,10 @@ class TopicController extends Controller
      */
     public function index()
     {
-        return view('admin.topics.index');
+        $topics = Topic::withCount('activities')->get(); // Obtener los temas con el conteo de actividades
+        return view('admin.topics.index', compact('topics'));
     }
+
 
     /**
      * Show the form for creating a new resource.

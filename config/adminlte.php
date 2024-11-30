@@ -345,6 +345,11 @@ return [
             'icon' => 'fas fa-fw fa-solid fa-book',
         ],
         [
+            'text' => 'Actividades',
+            'route' => 'activities.index',
+            'icon' => 'fas fa-fw fa-tasks',
+        ],        
+        [
             'header' => 'SEGURIDAD Y RECUPERACIÓN',
             'classes' => 'text-danger font-weight-bold text-uppercase',
         ],

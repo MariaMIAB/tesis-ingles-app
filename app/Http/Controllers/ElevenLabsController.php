@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Services\ElevenLabsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class ElevenLabsController extends Controller
 {
@@ -22,10 +24,25 @@ class ElevenLabsController extends Controller
             return response()->json(['error' => 'Contenido no encontrado'], 404);
         }
 
-        $text = strip_tags($content->body);
-        $audioContent = $this->elevenLabsService->textToSpeech($text);
+        try {
+            $text = strip_tags($content->body);
+            $audioContent = $this->elevenLabsService->textToSpeech($text);
 
-        return response($audioContent, 200)
-            ->header('Content-Type', 'audio/mpeg');
+            if (!$audioContent) {
+                throw new Exception('No se pudo generar el audio.');
+            }
+
+            return response($audioContent, 200)
+                ->header('Content-Type', 'audio/mpeg');
+        } catch (Exception $e) {
+            Log::error('Error en textToSpeech: ' . $e->getMessage(), [
+                'contentId' => $contentId,
+                'text' => $text ?? 'Texto no disponible'
+            ]);
+
+            return response()->json(['error' => 'Error al generar el audio'], 500);
+        }
     }
 }
+
+
