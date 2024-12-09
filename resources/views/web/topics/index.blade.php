@@ -15,13 +15,22 @@
                                 <h5 class="card-title topic-title">{{ $topic->topic_name }}</h5>
                                 <hr class="custom-hr">
                                 <p class="card-text">{{ Str::limit($topic->topic_description, 100, '...') }}</p>
-                                <p class="card-activities mt-auto mb-2 {{ $topic->activities_count == 0 ? 'no-activities-text' : '' }}">
-                                    @if($topic->activities_count == 0)
-                                        Sin Actividades
-                                    @else
-                                        <span class="activities-count">Actividades: {{ $topic->activities_count }}</span>
-                                    @endif
-                                </p>
+                                <div class="card-info mt-auto d-flex justify-content-between">
+                                    <p class="card-activities {{ $topic->activities_count == 0 ? 'no-activities-text' : '' }}">
+                                        @if($topic->activities_count == 0)
+                                            <span class="badge badge-secondary">Sin Actividades</span>
+                                        @else
+                                            <span class="badge badge-success">Actividades: {{ $topic->activities_count }}</span>
+                                        @endif
+                                    </p>
+                                    <p class="card-exams {{ $topic->exams_count == 0 ? 'no-exams-text' : '' }}">
+                                        @if($topic->exams_count == 0)
+                                            <span class="badge badge-secondary">Sin exámenes</span>
+                                        @else
+                                            <span class="badge badge-success">Exámenes disponibles: {{ $topic->exams_count }}</span>
+                                        @endif
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </a>
@@ -30,6 +39,22 @@
         </div>
     </div>
 @endsection
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+@if(session('success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Examen enviado exitosamente!',
+                text: '{{ session('success') }}',
+                confirmButtonText: 'Aceptar',
+            });
+        });
+    </script>
+@endif
+
 
 <style>
     .topics-container {
@@ -51,10 +76,12 @@
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
         transition: 0.3s;
         border-radius: 10px;
-        height: 300px; /* Aumentado para dar más espacio al contenido */
+        height: 350px;
         display: flex;
         flex-direction: column;
-        background-color: #f0f8ff; /* Color de fondo añadido */
+        background-color: #f0f8ff;
+        position: relative;
+        overflow: hidden;
     }
 
     .card-dm:hover {
@@ -66,6 +93,7 @@
         padding: 20px;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
     }
 
     .topic-title {
@@ -82,15 +110,15 @@
         margin: 15px 0;
     }
 
-    .custom-hr2 { 
-        border: 3px solid #007bff; /* Borde sólido más grande */ 
-        height: 10px; /* Ajustar la altura para darle más cuerpo */ 
-        background-color: #007bff; /* Color de fondo */ 
-        margin: 15px 0; /* Espacio superior e inferior */ 
-        width: 98%; /* Ancho del hr */ 
-        margin-left: auto; 
-        margin-right: auto; 
-        border-radius: 5px; /* Bordes redondeados */ 
+    .custom-hr2 {
+        border: 3px solid #007bff;
+        height: 10px;
+        background-color: #007bff;
+        margin: 15px 0;
+        width: 98%;
+        margin-left: auto;
+        margin-right: auto;
+        border-radius: 5px;
     }
 
     .card-text {
@@ -98,24 +126,46 @@
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
-        -webkit-line-clamp: 3; /* Número de líneas que se muestran */
+        -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
     }
 
-    .card-activities {
+    .card-activities,
+    .card-exams {
         font-size: 0.9rem;
         font-weight: bold;
         padding: 5px 10px;
-        background-color: #007bff; /* Fondo azul */
-        color: white; /* Texto blanco */
-        border-radius: 5px; /* Bordes redondeados */
-        text-align: center; /* Centrado del texto */
-        display: inline-block; /* Para el padding */
+        border-radius: 5px;
+        text-align: center;
+        display: inline-block;
+        max-width: 50%;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .card-activities {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .card-exams {
+        background-color: #ff0077;
+        color: white;
     }
 
     .no-activities-text {
-        background-color: #dc3545; /* Fondo rojo para 'Sin Actividades' */
-        color: white; /* Texto blanco */
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .no-exams-text {
+        background-color: #ffc107;
+        color: white;
+    }
+
+    .card-exams .badge {
+        font-size: 0.8rem;
     }
 
     .no-activities {
@@ -123,8 +173,8 @@
     }
 
     .card-link {
-        text-decoration: none; /* Quitar subrayado de enlaces */
-        color: inherit; /* Mantener el color del texto */
+        text-decoration: none;
+        color: inherit;
     }
 
     .card-link:hover .card-dm {
@@ -133,5 +183,19 @@
     }
 </style>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
 
 

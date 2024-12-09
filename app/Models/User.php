@@ -144,6 +144,12 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->hasMany(TopicLike::class);
     }
+
+    public function examsTaken()
+    {
+        return $this->belongsToMany(Exam::class, 'user_exams')->withPivot('score')->withTimestamps();
+    }
+
 }
 
 

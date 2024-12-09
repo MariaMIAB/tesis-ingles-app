@@ -69,31 +69,45 @@
                 @endforeach
             </div>
             <div class="col-md-5">
-                <h4>Actividades Relacionadas</h4>
+                <h4>Exámenes Relacionados</h4>
                 <div class="related-contents">
-                    @if($topic->activities->isEmpty())
-                    <div class="card card-dm">
-                        <div class="card-body">
-                            <p>No hay actividades.</p>
+                    @if($topic->exams->isEmpty())
+                        <div class="card card-dm">
+                            <div class="card-body">
+                                <p>No hay exámenes.</p>
+                            </div>
                         </div>
-                    </div>
                     @else
-                        @foreach($topic->activities as $activity)
-                            <div class="card card-dm">
+                        @foreach($topic->exams as $exam)
+                            <div class="card card-dm exam-card @if(Auth::user()->examsTaken->contains('id', $exam->id)) exam-completed @endif" 
+                                onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
                                 <div class="card-body">
-                                    <h5 class="card-title">{{ $activity->title }}</h5>
-                                    <hr class="custom-hr-content">
-                                    <p class="card-text">{{ $activity->description }}</p>
-                                    <a href="{{ route('activitiesu.show', $activity->id) }}" class="btn btn-primary ml-2">Ir a la Actividad</a>
+                                    <div class="row">
+                                        <div class="col-10">
+                                            <h5 class="card-title">{{ $exam->title }}</h5>
+                                            <p class="card-text">{{ $exam->description }}</p>
+                                        </div>
+                                        <div class="col-2 text-right">
+                                            @if(Auth::user()->examsTaken->contains('id', $exam->id))
+                                                <span class="badge badge-success">
+                                                    <i class="fas fa-check-circle"></i> Realizado
+                                                </span>
+                                            @else
+                                                <span class="badge badge-warning">
+                                                    <i class="fas fa-hourglass-half"></i> Pendiente
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         @endforeach
                     @endif
                 </div>
             </div>
-                    
+            
             <div class="col-md-5">
-                <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atras</a>
+                <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atrás</a>
             </div>
         </div>
     </div>
@@ -220,7 +234,32 @@
         display: flex;
         gap: 10px;
     }
+    .exam-card {
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .exam-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .exam-completed {
+        background-color: #e9f7ef;
+        border: 1px solid #28a745;
+    }
+
+    .exam-completed .card-title {
+        color: #28a745;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 5px 10px;
+        border-radius: 12px;
+    }
 </style>
+
 
 <!-- Include Bootstrap and SweetAlert scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

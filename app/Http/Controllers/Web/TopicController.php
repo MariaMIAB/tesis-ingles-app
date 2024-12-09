@@ -10,7 +10,7 @@ class TopicController extends Controller
     // Método para listar todos los temas
     public function index()
     {
-        $topics = Topic::withCount('activities')->with('contents')->get();
+        $topics = Topic::withCount('activities', 'exams')->with('contents')->get();
         return view('web.topics.index', compact('topics'));
     }
     

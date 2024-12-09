@@ -14,7 +14,7 @@ class Activity extends Model
         'description',
         'link',
         'status',
-        'topic_id', // Clave foránea
+        'topic_id',
     ];
 
     // Relación inversa con Topic

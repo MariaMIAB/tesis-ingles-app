@@ -345,6 +345,11 @@ return [
             'icon' => 'fas fa-fw fa-solid fa-book',
         ],
         [
+            'text' => 'Exams',
+            'route' => 'exams.index',
+            'icon' => 'fas fa-fw fa-book-open',
+        ],        
+        [
             'text' => 'Actividades',
             'route' => 'activities.index',
             'icon' => 'fas fa-fw fa-tasks',

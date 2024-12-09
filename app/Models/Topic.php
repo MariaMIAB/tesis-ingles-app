@@ -37,5 +37,8 @@ class Topic extends Model
     public function activities() { 
         return $this->hasMany(Activity::class); 
     }
+    public function exams() { 
+        return $this->hasMany(Exam::class); 
+    }
 }
 
