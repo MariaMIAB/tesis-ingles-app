@@ -7,10 +7,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Activity;
 use App\Models\Topic;
+use App\Traits\Trashable;
 
 class ActivityController extends Controller
 {
-
+    use Trashable;
+    
     public function datatables()
     {
         $query = Activity::with('topic');
@@ -23,7 +25,6 @@ class ActivityController extends Controller
             ->rawColumns(['btn'])
             ->toJson();
     }
-    
 
     // Listar todas las actividades
     public function index()
@@ -64,8 +65,6 @@ class ActivityController extends Controller
         $embedLink = str_replace("/content/", "/content/", $activity->link . "/embed");
         return view('admin.activities.show', compact('activity', 'embedLink'));
     }
-    
-    
 
     // Mostrar el formulario para editar una actividad existente
     public function edit($id)
@@ -98,5 +97,26 @@ class ActivityController extends Controller
     {
         $activity->delete();
         return redirect()->route('activities.index')->with('success', 'Actividad eliminada exitosamente');
+    }
+
+    public function moveToTrash($id)
+    {
+        $activity = Activity::findOrFail($id);
+        $activity->delete();
+        return redirect()->route('trash.index')->with('success', 'Actividad movida a la papelera.');
+    }
+
+    public function restoreFromTrash($id)
+    {
+        $activity = Activity::onlyTrashed()->findOrFail($id);
+        $activity->restore();
+        return redirect()->route('trash.index')->with('success', 'Actividad restaurada desde la papelera.');
+    }
+
+    public function forceDeleteFromTrash($id)
+    {
+        $activity = Activity::onlyTrashed()->findOrFail($id);
+        $activity->forceDelete();
+        return redirect()->route('trash.index')->with('success', 'Actividad eliminada permanentemente.');
     }
 }

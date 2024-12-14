@@ -7,12 +7,14 @@ use App\Http\Requests\User\StoreRequest;
 use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use App\Models\Year;
+use App\Traits\Trashable;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
 class UserController extends Controller
 {
+    use Trashable;
 
     public function datatables(){
         return DataTables::eloquent(User::with('roles')->select('users.*'))
@@ -23,97 +25,61 @@ class UserController extends Controller
             ->rawColumns(['btn'])
             ->toJson();
     }
-    
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         return view('admin.users.index');
     }
 
-    public function seeDeleted()
-    {
-        $trash = User::onlyTrashed()->get();
-        return view('admin.users.trash', compact('trash'));
-    }
-
-    public function restore($id)
-    {
-        $usuario = User::withTrashed()->find($id);
-        $usuario->restore();
-        return redirect()->route('trash.deleted')->with('success', 'Usuario restaurado exitosamente.');
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $user = new User();
         $roles = Role::get();
-        $years = Year::all(); // Obtener todos los años
+        $years = Year::all();
         return view('admin.users.create', compact('user', 'roles', 'years'));
     }
-    
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreRequest $request)
     {
         $validatedData = $request->validated();
         $user = User::create($validatedData);
-    
+
         if ($request->has('role')) {
             $user->assignRole($request->input('role'));
         }
-    
+
         if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
-            $user
-                ->addMediaFromRequest('avatar')
-                ->toMediaCollection('avatar');
+            $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
         }
-    
+
         if ($user->hasRole('Estudiante')) {
             $yearId = $request->input('current_year') ? Year::where('name', now()->year)->first()->id : $request->input('year');
             $year = Year::with('semesters')->findOrFail($yearId);
-    
+
             $user->years()->attach($year->id);
-    
+
             $semester = $year->semesters->random();
             $user->semesters()->attach($semester->id);
         }
-    
+
         return redirect()->route('users.show', [$user->id])->with('success', 'Usuario guardado correctamente.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(User $user)
     {
         return view('admin.users.show', compact('user'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit($id)
     {
         $user = User::findOrFail($id);
         $roles = Role::get();
-        $years = Year::all(); // Obtener todos los años
-
-        // Obtener el año actual del usuario
+        $years = Year::all();
         $currentYear = $user->years()->first();
 
         return view('admin.users.edit', compact('user', 'roles', 'years', 'currentYear'));
     }
 
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateRequest $request, User $user)
     {
         $validatedData = $request->validated();
@@ -129,19 +95,15 @@ class UserController extends Controller
             }
 
             if ($request->hasFile('avatar') && $request->file('avatar')->isValid()) {
-                
                 if ($user->getMedia('avatar')->count() > 0) {
                     $user->getMedia('avatar')->each(function ($mediaItem) {
                         $mediaItem->delete();
                     });
                 }
-            
-                $user
-                    ->addMediaFromRequest('avatar')
-                    ->toMediaCollection('avatar');
+
+                $user->addMediaFromRequest('avatar')->toMediaCollection('avatar');
             }
 
-            // Asignar año y semestre si el rol es "Estudiante"
             if ($user->hasRole('Estudiante')) {
                 $yearId = $request->input('current_year') ? Year::where('name', now()->year)->first()->id : $request->input('year');
                 $year = Year::with('semesters')->findOrFail($yearId);
@@ -158,14 +120,32 @@ class UserController extends Controller
         }
     }
 
-
-
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'El Usuario a sido eliminado con exito');
+        return redirect()->route('users.index')->with('success', 'El usuario ha sido eliminado con éxito.');
+    }
+
+    public function moveToTrash($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('trash.index')->with('success', 'Usuario movido a la papelera.');
+    }
+
+    public function restoreFromTrash($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->restore();
+        return redirect()->route('trash.index')->with('success', 'Usuario restaurado desde la papelera.');
+    }
+
+    public function forceDeleteFromTrash($id)
+    {
+        $user = User::onlyTrashed()->findOrFail($id);
+        $user->forceDelete();
+        return redirect()->route('trash.index')->with('success', 'Usuario eliminado permanentemente.');
     }
 }
+
+

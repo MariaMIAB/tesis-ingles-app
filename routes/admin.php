@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\ExamController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\OptionController;
 use App\Http\Controllers\Admin\UserAnswerController;
+use App\Http\Controllers\Admin\TrashController;
 
 Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
 
@@ -32,7 +33,7 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
         'years' => YearController::class,
         'semesters' => SemesterController::class,
         'topics' => TopicController::class,
-        'contents' => ContentController::class,
+      
         'activities' => ActivityController::class,
         'exams' => ExamController::class,
         'options' => OptionController::class,
@@ -50,6 +51,10 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     Route::get('questions/edit/{exam}', [QuestionController::class, 'edit'])->name('questions.edit');
 
     //contents
+    Route::prefix('topics')->group(function () {
+        Route::get('{topicId}/contents', [ContentController::class, 'index'])->name('topics.contents.index');
+    });
+    
     Route::get('contents/create/{topic_id}', [ContentController::class, 'create'])->name('contents.create');
 
     //semestre
@@ -57,8 +62,6 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     Route::get('/semesters/create/{id}', [SemesterController::class, 'create'])->name('semesters.create');
 
     Route::get('topics/{topicId}/contents', [ContentController::class, 'index'])->name('topics.contents.index');
-    Route::get('/trash/deleted', [UserController::class, 'seeDeleted'])->name('trash.deleted');
-    Route::patch('/trash/restore/{id}', [UserController::class, 'restore'])->name('trash.restore');
     Route::get('api/years/{year}/semesters', [TopicController::class, 'getSemestersByYear']);
 
     // Rutas de tablas
@@ -78,10 +81,34 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     // Rutas de vistas y likes
     Route::post('/topics/{topic}/view', [TopicController::class, 'storeView'])->name('topics.view');
     Route::post('/topics/{topic}/like', [TopicController::class, 'storeLike'])->name('topics.like');
-});
 
+    Route::get('trash', [TrashController::class, 'index'])->name('trash.index');
 
+    // Rutas para usuarios
+    Route::prefix('users')->group(function () {
+        Route::delete('{id}/trash', [UserController::class, 'moveToTrash'])->name('users.trash');
+        Route::post('{id}/restore', [UserController::class, 'restoreFromTrash'])->name('users.restore');
+        Route::delete('{id}/force-delete', [UserController::class, 'forceDeleteFromTrash'])->name('users.forceDelete');
+    });
+    
+    // Rutas para topics
+    Route::prefix('topics')->group(function () {
+        Route::delete('{id}/trash', [TopicController::class, 'moveToTrash'])->name('topics.trash');
+        Route::post('{id}/restore', [TopicController::class, 'restoreFromTrash'])->name('topics.restore');
+        Route::delete('{id}/force-delete', [TopicController::class, 'forceDeleteFromTrash'])->name('topics.forceDelete');
+    });
 
+    // Rutas para contenidos
+    Route::prefix('contents')->group(function () {
+        Route::delete('{id}/trash', [ContentController::class, 'moveToTrash'])->name('contents.trash');
+        Route::post('{id}/restore', [ContentController::class, 'restoreFromTrash'])->name('contents.restore');
+        Route::delete('{id}/force-delete', [ContentController::class, 'forceDeleteFromTrash'])->name('contents.forceDelete');
+    });
 
-
-
+    // Rutas para actividades
+    Route::prefix('activities')->group(function () {
+        Route::delete('{id}/trash', [ActivityController::class, 'moveToTrash'])->name('activities.trash');
+        Route::post('{id}/restore', [ActivityController::class, 'restoreFromTrash'])->name('activities.restore');
+        Route::delete('{id}/force-delete', [ActivityController::class, 'forceDeleteFromTrash'])->name('activities.forceDelete');
+    });
+}); 

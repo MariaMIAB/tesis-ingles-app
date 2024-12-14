@@ -9,27 +9,17 @@
                     <div class="buttons ml-auto">
                         <form action="{{ route('topics.view', $topic->id) }}" method="POST">
                             @csrf
-                            @if(Auth::user()->views->contains('topic_id', $topic->id))
-                                <button type="submit" class="btn btn-info">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            @else
-                                <button type="submit" class="btn btn-secondary">
-                                    <i class="fas fa-eye-slash"></i>
-                                </button>
-                            @endif
+                            <!-- Verificación de si el usuario ya ha visto el tema -->
+                            <button type="submit" class="btn {{ Auth::user()->views->contains('topic_id', $topic->id) ? 'btn-info' : 'btn-secondary' }}">
+                                <i class="fas fa-eye{{ Auth::user()->views->contains('topic_id', $topic->id) ? '' : '-slash' }}"></i>
+                            </button>
                         </form>
                         <form action="{{ route('topics.like', $topic->id) }}" method="POST">
                             @csrf
-                            @if(Auth::user()->likes->contains('topic_id', $topic->id))
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-thumbs-up"></i>
-                                </button>
-                            @else
-                                <button type="submit" class="btn btn-secondary">
-                                    <i class="fas fa-thumbs-down"></i>
-                                </button>
-                            @endif
+                            <!-- Verificación de si el usuario ha dado like al tema -->
+                            <button type="submit" class="btn {{ Auth::user()->likes->contains('topic_id', $topic->id) ? 'btn-primary' : 'btn-secondary' }}">
+                                <i class="fas fa-thumbs-{{ Auth::user()->likes->contains('topic_id', $topic->id) ? 'up' : 'down' }}"></i>
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -46,7 +36,9 @@
                                 </div>
                                 <div class="col-2">
                                     <audio id="audio-player-{{ $content->id }}" src="{{ url('/text-to-speech/' . $content->id) }}" type="audio/mpeg"></audio>
-                                    <button onclick="toggleAudio({{ $content->id }})" id="audio-button-{{ $content->id }}" class="btn btn-primary"> <i class="fas fa-play"></i> </button>
+                                    <button onclick="toggleAudio({{ $content->id }})" id="audio-button-{{ $content->id }}" class="btn btn-primary"> 
+                                        <i class="fas fa-play"></i> 
+                                    </button>
                                 </div>
                             </div>
                             <hr class="custom-hr-content">
@@ -68,52 +60,113 @@
                     </div>
                 @endforeach
             </div>
+
             <div class="col-md-5">
-                <h4>Exámenes Relacionados</h4>
+                <!-- Exámenes Relacionados -->
+                <h4 class="section-title">Exámenes Relacionados</h4>
                 <div class="related-contents">
-                    @if($topic->exams->isEmpty())
-                        <div class="card card-dm">
+                    @forelse($topic->exams as $exam)
+                        <div class="card card-dm exam-card {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'exam-completed' : '' }}" 
+                            onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
                             <div class="card-body">
-                                <p>No hay exámenes.</p>
-                            </div>
-                        </div>
-                    @else
-                        @foreach($topic->exams as $exam)
-                            <div class="card card-dm exam-card @if(Auth::user()->examsTaken->contains('id', $exam->id)) exam-completed @endif" 
-                                onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-10">
-                                            <h5 class="card-title">{{ $exam->title }}</h5>
-                                            <p class="card-text">{{ $exam->description }}</p>
-                                        </div>
-                                        <div class="col-2 text-right">
-                                            @if(Auth::user()->examsTaken->contains('id', $exam->id))
-                                                <span class="badge badge-success">
-                                                    <i class="fas fa-check-circle"></i> Realizado
-                                                </span>
-                                            @else
-                                                <span class="badge badge-warning">
-                                                    <i class="fas fa-hourglass-half"></i> Pendiente
-                                                </span>
-                                            @endif
-                                        </div>
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="card-title exam-title">{{ $exam->title }}</h5>
+                                        <p class="card-text exam-description">{{ $exam->description }}</p>
+                                    </div>
+                                    <div class="col-2 text-right">
+                                        <span class="badge badge-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'success' : 'warning' }} exam-status">
+                                            <i class="fas fa-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'check-circle' : 'hourglass-half' }}"></i> 
+                                            {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'Realizado' : 'Pendiente' }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    @endif
+                        </div>
+                    @empty
+                        <div class="card card-dm">
+                            <div class="card-body">
+                                <p>No hay exámenes relacionados.</p>
+                            </div>
+                        </div>
+                    @endforelse
+                </div>
+            
+                <hr class="custom-hr">
+            
+                <!-- Actividades Relacionadas -->
+                <h4 class="section-title">Actividades Relacionadas</h4>
+                <div class="related-contents">
+                    @forelse($topic->activities as $activity)
+                        <!-- Hacemos que toda la tarjeta sea clickeable -->
+                        <a href="{{ route('activitiesu.show', $activity->id) }}" class="card card-dm activity-card clickable-card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-10">
+                                        <h5 class="card-title activity-title">{{ $activity->title }}</h5>
+                                        <p class="card-text activity-description">{{ $activity->description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    @empty
+                        <div class="card card-dm">
+                            <div class="card-body">
+                                <p>No hay actividades relacionadas.</p>
+                            </div>
+                        </div>
+                    @endforelse
                 </div>
             </div>
             
-            <div class="col-md-5">
-                <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atrás</a>
-            </div>
+            
+        </div>
+        
+        <!-- Botón atrás -->
+        <div class="col-md-12 text-center mt-5">
+            <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atrás</a>
         </div>
     </div>
 @endsection
 
 <style>
+
+    /* Hacer que la tarjeta sea clickeable */
+    .clickable-card {
+        display: block;  /* Aseguramos que el enlace ocupe todo el espacio de la tarjeta */
+        cursor: pointer; /* Cambiar el cursor al pasar sobre la tarjeta */
+        text-decoration: none; /* Quitar el subrayado por defecto de los enlaces */
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añadir transiciones suaves */
+    }
+
+    /* Efecto de hover para la tarjeta */
+    .clickable-card:hover {
+        transform: translateY(-5px); /* Mover ligeramente la tarjeta hacia arriba */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra para indicar interactividad */
+    }
+
+    /* Estilo para el título y la descripción */
+    .activity-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .activity-description {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    /* Ajuste para la columna de la derecha con el badge */
+    .activity-status {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background-color: #007bff;
+    }
+
+
     .topics-container {
         max-width: 1600px;
         margin: 0 auto;

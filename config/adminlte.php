@@ -360,7 +360,7 @@ return [
         ],
         [
             'text' => 'Papelera',
-            'route' => 'trash.deleted',
+            'route' => 'trash.index',
             'icon' => 'fas fa-fw fa-trash',
         ],
         [

@@ -25,6 +25,8 @@
             <label for="link">Enlace H5P</label>
             <input id="link" name="link" type="url" placeholder="https://h5p.org/content/..." class="form-control form-control-sm"
                 value="{{ old('link', $activity->link ?? '') }}" required />
+                <br>
+            <a href="https://h5p.org/" class="btn-h5p" target="_blank">Ir a H5P</a>
             @error('link')
                 <span class="invalid-feedback d-block" role="alert">
                     <strong>{{ $message }}</strong>

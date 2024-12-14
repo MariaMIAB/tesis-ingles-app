@@ -5,11 +5,14 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Content;
 use App\Models\Topic;
+use App\Traits\Trashable;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 class ContentController extends Controller
 {
+    use Trashable;
+    
     public function datatables($id)
     {
         $contents = Content::where('topic_id', $id)->get();
@@ -26,7 +29,6 @@ class ContentController extends Controller
         $topic = Topic::findOrFail($topicId);
         return view('admin.contents.index', compact('topic'));
     }
-
 
     public function create($topic_id)
     {
@@ -67,7 +69,6 @@ class ContentController extends Controller
         return view('admin.contents.edit', compact('content', 'topic'));
     }
 
-
     public function update(Request $request, $id)
     {
         $validatedData = $request->validate([
@@ -92,8 +93,33 @@ class ContentController extends Controller
 
     public function destroy(Content $content)
     {
+        $topicId = $content->topic_id;  // Capturamos el topic_id antes de eliminar
         $content->delete();
 
-        return redirect()->route('contents.index')->with('success', 'Content deleted successfully!');
+        return redirect()->route('topics.contents.index', ['topicId' => $topicId])
+                            ->with('success', 'Contenido eliminado correctamente!');
+    }
+
+    public function moveToTrash($id)
+    {
+        $content = Content::findOrFail($id);
+        $content->delete();
+        return redirect()->route('trash.index')->with('success', 'Contenido movido a la papelera.');
+    }
+
+    public function restoreFromTrash($id)
+    {
+        $content = Content::onlyTrashed()->findOrFail($id);
+        $content->restore();
+        return redirect()->route('trash.index')->with('success', 'Contenido restaurado desde la papelera.');
+    }
+
+    public function forceDeleteFromTrash($id)
+    {
+        $content = Content::onlyTrashed()->findOrFail($id);
+        $content->forceDelete();
+        return redirect()->route('trash.index')->with('success', 'Contenido eliminado permanentemente.');
     }
 }
+
+

@@ -242,5 +242,7 @@
     "communication": "Communication",
     "communication_message": "Communication is key in any course, so I will be available to answer any questions you may have. You can contact me via [email, learning platform, etc.] and I will send you information about the course through [email, learning platform, etc.].",
     "course_image_alt": "Course Image",
-    "ENGLISH_SYSTEM": "ENGLISH SYSTEM"
+    "ENGLISH_SYSTEM": "ENGLISH SYSTEM",
+    "ENGLISH_PLATFORM": "ENGLISH PLATFORM",
+    "Topics": "Topics"
 }

@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->foreignId('topic_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

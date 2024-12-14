@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="card bg-success">
         <div class="card-header">
-            <h1 class="text-white font-weight-bold" style="border-bottom: 4px solid white;">Lista de Usuarios</h1>
+            <h1 class="text-white font-weight-bold" style="border-bottom: 4px solid white;">Lista de Periodos Escolares</h1>
         </div>
     </div>
 @stop
