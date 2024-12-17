@@ -66,23 +66,33 @@
                 <h4 class="section-title">Exámenes Relacionados</h4>
                 <div class="related-contents">
                     @forelse($topic->exams as $exam)
-                        <div class="card card-dm exam-card {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'exam-completed' : '' }}" 
-                            onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-10">
-                                        <h5 class="card-title exam-title">{{ $exam->title }}</h5>
-                                        <p class="card-text exam-description">{{ $exam->description }}</p>
-                                    </div>
-                                    <div class="col-2 text-right">
-                                        <span class="badge badge-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'success' : 'warning' }} exam-status">
-                                            <i class="fas fa-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'check-circle' : 'hourglass-half' }}"></i> 
-                                            {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'Realizado' : 'Pendiente' }}
-                                        </span>
+                        @if ($exam->visibility)  <!-- Verificación de si el examen está visible -->
+                            <div class="card card-dm exam-card {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'exam-completed' : '' }}" 
+                                onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-10">
+                                            <h5 class="card-title exam-title">{{ $exam->title }}</h5>
+                                            <p class="card-text exam-description">{{ $exam->description }}</p>
+                                        </div>
+                                        <div class="col-2 text-right">
+                                            <span class="badge badge-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'success' : 'warning' }} exam-status">
+                                                <i class="fas fa-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'check-circle' : 'hourglass-half' }}"></i> 
+                                                {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'Realizado' : 'Pendiente' }}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        @else
+                            <!-- Mostrar mensaje si el examen no está visible -->
+                            <div class="card card-dm">
+                                <div class="card-body">
+                                    <h5 class="card-title exam-title">{{ $exam->title }}</h5>
+                                    <p>Este examen no está disponible en este momento.</p>
+                                </div>
+                            </div>
+                        @endif
                     @empty
                         <div class="card card-dm">
                             <div class="card-body">
@@ -117,8 +127,7 @@
                         </div>
                     @endforelse
                 </div>
-            </div>
-            
+            </div>            
             
         </div>
         

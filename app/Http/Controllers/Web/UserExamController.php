@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use App\Models\Exam;
 use App\Models\UserAnswer;
-use App\Models\UserExam; // Asegúrate de tener un modelo para guardar las calificaciones
+use App\Models\UserExam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,235 +16,185 @@ class UserExamController extends Controller
         // Obtener el examen tomado por el usuario
         $userExam = Auth::user()->examsTaken()->where('exam_id', $exam->id)->first();
 
-        // Si el usuario no ha tomado el examen, redirigirlo
         if (!$userExam) {
-            return view('web.exams.show',compact('exam'));
+            return view('web.exams.show', compact('exam'));
         }
 
         $score = $userExam->pivot->score;
 
-        // Obtener las respuestas del usuario desde la tabla UserAnswer, usando question_id
+        // Obtener las respuestas del usuario
         $userAnswers = UserAnswer::whereIn('question_id', $exam->questions->pluck('id'))
-                                ->where('user_id', Auth::id())
-                                ->get()
-                                ->keyBy('question_id'); // Usamos keyBy para acceder a las respuestas por question_id fácilmente
+            ->where('user_id', Auth::id())
+            ->get()
+            ->keyBy('question_id');
 
-        // Inicializar el array para almacenar las respuestas correctas
+        // Inicializar datos para las respuestas correctas
         $correctAnswers = [];
-        $correctCount = 0; // Variable para contar las respuestas correctas
+        $results = [];
+        $correctCount = 0;
 
         foreach ($exam->questions as $question) {
-            // Verificar si la pregunta tiene opciones y obtener la respuesta correcta
-            if ($question->type == 'multiple_choice') {
-                $correctAnswers[$question->id] = $question->options()->where('is_correct', true)->first();
-            }
-            // Si la pregunta es de tipo verdadero/falso o respuesta corta, obtenemos la respuesta correcta
-            elseif ($question->type == 'true_false' || $question->type == 'short_answer') {
-                $correctAnswers[$question->id] = $question->answers()->first();
+            $correctAnswer = null;
+
+            // Obtener la respuesta correcta
+            if ($question->type === 'multiple_choice') {
+                $correctAnswer = $question->options()->where('is_correct', true)->first();
+            } elseif (in_array($question->type, ['true_false', 'short_answer'])) {
+                $correctAnswer = $question->answers()->first();
             }
 
-            // Verificar si la respuesta del usuario es correcta y contar
-            if (isset($userAnswers[$question->id]) && $userAnswers[$question->id]->answer == $correctAnswers[$question->id]->content) {
-                $correctCount++; // Incrementamos el contador de respuestas correctas
+            $correctAnswers[$question->id] = $correctAnswer;
+
+            // Obtener la respuesta del usuario
+            $userAnswer = $userAnswers->get($question->id);
+
+            if ($userAnswer && $correctAnswer) {
+                if ($question->type === 'multiple_choice') {
+                    $results[$question->id] = (int) $userAnswer->answer === (int) $correctAnswer->id;
+                } else {
+                    $results[$question->id] = strtolower(trim($userAnswer->answer)) === strtolower(trim($correctAnswer->content));
+                }
+
+                if ($results[$question->id]) {
+                    $correctCount++;
+                }
+            } else {
+                $results[$question->id] = false;
             }
         }
 
-        // Pasar los datos a la vista
-        return view('web.exams.results', compact('exam', 'userExam', 'userAnswers', 'correctAnswers', 'score', 'correctCount'));
+        return view('web.exams.results', compact('exam', 'userExam', 'userAnswers', 'correctAnswers', 'results', 'score', 'correctCount'));
     }
 
-    
     public function submit(Request $request, Exam $exam)
-{
-    $userId = Auth::id();
-    
-    // Validar que todas las preguntas tienen respuesta
-    $validated = $request->validate([
-        'answers' => 'required|array', // La respuesta debe ser un arreglo
-    ]);
+    {
+        $userId = Auth::id();
 
-    // Inicializar las variables para el cálculo de la calificación
-    $totalQuestions = $exam->questions->count();  // Total de preguntas
-    $correctAnswers = 0;  // Respuestas correctas
-    $pointsPerCorrectAnswer = 100 / $totalQuestions;  // Puntaje por respuesta correcta
+        // Validar las respuestas enviadas
+        $validated = $request->validate([
+            'answers' => 'required|array',
+        ]);
 
-    // Recorrer las preguntas y guardar las respuestas
-    foreach ($exam->questions as $question) {
-        // Obtener la respuesta seleccionada por el usuario (puede ser option_id o texto)
-        $answerContent = $validated['answers'][$question->id] ?? null;
+        $totalQuestions = $exam->questions->count();
+        $correctAnswers = 0;
+        $pointsPerCorrectAnswer = 100 / $totalQuestions;
 
-        if ($answerContent) {
-            $isCorrect = false;  // Asumir que la respuesta es incorrecta
+        foreach ($exam->questions as $question) {
+            $answerContent = $validated['answers'][$question->id] ?? null;
 
-            // Comprobación según el tipo de pregunta
-            switch ($question->type) {
-                case 'multiple_choice': // Opción múltiple
-                    // Buscar la opción seleccionada por el usuario (suponiendo que 'answerContent' es el ID de la opción)
-                    $selectedOption = $question->options()->find($answerContent);
+            if ($answerContent) {
+                $isCorrect = false;
 
-                    // Verificar si la opción seleccionada es correcta (is_correct = 1)
-                    if ($selectedOption && $selectedOption->is_correct == 1) {
-                        $isCorrect = true;
-                    }
+                switch ($question->type) {
+                    case 'multiple_choice':
+                        $selectedOption = $question->options()->find($answerContent);
 
-                    // Guardar la respuesta del usuario en 'option_id' para preguntas de opción múltiple
-                    UserAnswer::updateOrCreate(
-                        [
-                            'user_id' => $userId,
-                            'question_id' => $question->id,
-                        ],
-                        [
-                            'answer' => $answerContent,     // Guardamos si la respuesta fue correcta
-                        ]
-                    );
+                        if ($selectedOption && $selectedOption->is_correct) {
+                            $isCorrect = true;
+                        }
 
-                    // Si la respuesta fue correcta, aumentar el contador
-                    if ($isCorrect) {
-                        $correctAnswers++;
-                    }
-                    break;
+                        UserAnswer::updateOrCreate(
+                            [
+                                'user_id' => $userId,
+                                'question_id' => $question->id,
+                            ],
+                            [
+                                'answer' => $answerContent,
+                            ]
+                        );
 
-                case 'true_false': // Verdadero/Falso
-                    // Buscar la respuesta correcta en la tabla 'answers'
-                    $correctAnswer = $question->answers()->first(); // Suponiendo que solo hay una respuesta correcta
-                    if ($correctAnswer && strtolower($correctAnswer->content) == strtolower($answerContent)) {
-                        $isCorrect = true;
-                    }
+                        break;
 
-                    // Guardar la respuesta del usuario en 'answer' para Verdadero/Falso
-                    UserAnswer::updateOrCreate(
-                        [
-                            'user_id' => $userId,
-                            'question_id' => $question->id,
-                        ],
-                        [
-                            'answer' => $answerContent,    // Guardamos la respuesta textual
-                            'is_correct' => $isCorrect,    // Guardamos si la respuesta fue correcta
-                        ]
-                    );
+                    case 'true_false':
+                    case 'short_answer':
+                        $correctAnswer = $question->answers()->first();
 
-                    // Si la respuesta fue correcta, aumentar el contador
-                    if ($isCorrect) {
-                        $correctAnswers++;
-                    }
-                    break;
+                        if ($correctAnswer && strtolower($correctAnswer->content) === strtolower($answerContent)) {
+                            $isCorrect = true;
+                        }
 
-                case 'short_answer': // Respuesta corta
-                    // Buscar la respuesta correcta en la tabla 'answers'
-                    $correctAnswer = $question->answers()->first(); // Suponiendo que solo hay una respuesta correcta
-                    if ($correctAnswer && strtolower($correctAnswer->content) == strtolower($answerContent)) {
-                        $isCorrect = true;
-                    }
+                        UserAnswer::updateOrCreate(
+                            [
+                                'user_id' => $userId,
+                                'question_id' => $question->id,
+                            ],
+                            [
+                                'answer' => $answerContent,
+                                'is_correct' => $isCorrect,
+                            ]
+                        );
 
-                    // Guardar la respuesta del usuario en 'answer' para respuesta corta
-                    UserAnswer::updateOrCreate(
-                        [
-                            'user_id' => $userId,
-                            'question_id' => $question->id,
-                        ],
-                        [
-                            'answer' => $answerContent,    // Guardamos la respuesta textual para respuestas cortas
-                            'is_correct' => $isCorrect,    // Guardamos si la respuesta fue correcta
-                        ]
-                    );
+                        break;
+                }
 
-                    // Si la respuesta fue correcta, aumentar el contador
-                    if ($isCorrect) {
-                        $correctAnswers++;
-                    }
-                    break;
-
-                default:
-                    // Si el tipo de pregunta no es reconocido, asume que la respuesta es incorrecta
-                    $isCorrect = false;
-                    break;
+                if ($isCorrect) {
+                    $correctAnswers++;
+                }
             }
         }
+
+        $score = round($correctAnswers * $pointsPerCorrectAnswer);
+
+        UserExam::updateOrCreate(
+            [
+                'user_id' => $userId,
+                'exam_id' => $exam->id,
+            ],
+            [
+                'score' => $score,
+            ]
+        );
+
+        return redirect()->route('topicsu.index')->with('success', 
+            'Examen enviado exitosamente. Tu calificación es: ' . $score . '% (' . $correctAnswers . ' de ' . $totalQuestions . ' respuestas correctas).');
     }
 
-    // Calcular la calificación basada en las respuestas correctas
-    $score = round($correctAnswers * $pointsPerCorrectAnswer);  // Puntaje total basado en las respuestas correctas
+    public function showResults($exam_id)
+    {
+        $exam = Exam::findOrFail($exam_id);
 
-    // Guardar la calificación en la tabla 'user_exams'
-    UserExam::updateOrCreate(
-        [
-            'user_id' => $userId,
-            'exam_id' => $exam->id,
-        ],
-        [
-            'score' => $score,
-        ]
-    );
+        $userExam = Auth::user()->examsTaken()->where('exam_id', $exam->id)->first();
 
-    // Redirigir con mensaje de éxito mostrando la cantidad de respuestas correctas y el puntaje
-    return redirect()->route('topicsu.index')->with('success', 
-        'Examen enviado exitosamente. Tu calificación es: ' . $score . '% (' . $correctAnswers . ' de ' . $totalQuestions . ' respuestas correctas).');
-}
-
-    
-public function showResults($exam_id)
-{
-    // Obtener el examen
-    $exam = Exam::findOrFail($exam_id);
-    
-    // Obtener el examen tomado por el usuario
-    $userExam = Auth::user()->examsTaken()->where('exam_id', $exam->id)->first();
-    
-    // Si el usuario no ha tomado el examen, redirigirlo
-    if (!$userExam) {
-        return redirect()->route('exams.take', $exam->id);
-    }
-
-    // Obtener las respuestas del usuario (suponiendo que las respuestas están almacenadas en UserAnswer)
-    $userAnswers = UserAnswer::where('exam_id', $exam->id)
-                             ->where('user_id', Auth::id())
-                             ->get();
-    
-    // Inicializamos un array para almacenar los resultados
-    $results = [];
-    
-    // Obtener las respuestas correctas para las preguntas
-    foreach ($exam->questions as $question) {
-        $correctAnswer = null;
-
-        // Determinamos la respuesta correcta según el tipo de pregunta
-        if ($question->type == 'multiple_choice') {
-            // Preguntas de opción múltiple: buscamos la opción correcta
-            $correctAnswer = $question->options()->where('is_correct', true)->first();
-           dd($correctAnswer);
-        } elseif ($question->type == 'true_false' || $question->type == 'short_answer') {
-            // Preguntas de verdadero/falso o respuesta corta: la respuesta correcta está en "answers"
-            $correctAnswer = $question->answers()->first();
+        if (!$userExam) {
+            return redirect()->route('exams.take', $exam->id);
         }
 
-        // Ahora obtenemos la respuesta dada por el usuario
-        $userAnswer = $userAnswers->where('question_id', $question->id)->first();
+        $userAnswers = UserAnswer::where('exam_id', $exam->id)
+            ->where('user_id', Auth::id())
+            ->get()
+            ->keyBy('question_id');
 
-        // Comparamos la respuesta del usuario con la correcta
-        if ($userAnswer) {
-            // Si es una pregunta de opción múltiple, comparamos el campo `user_answers.answer` con el ID de la opción correcta
-            if ($question->type == 'multiple_choice') {
-                $results[$question->id] = (int) $userAnswer->answer === (int) $correctAnswer->id;
+        $results = [];
+        $correctCount = 0;
+
+        foreach ($exam->questions as $question) {
+            $correctAnswer = null;
+
+            if ($question->type === 'multiple_choice') {
+                $correctAnswer = $question->options()->where('is_correct', true)->first();
+            } elseif (in_array($question->type, ['true_false', 'short_answer'])) {
+                $correctAnswer = $question->answers()->first();
             }
-            // Si es una pregunta de verdadero/falso o respuesta corta, comparamos el texto de la respuesta
-            else {
-                $results[$question->id] = strtolower(trim($userAnswer->answer)) === strtolower(trim($correctAnswer->answer));
+
+            $userAnswer = $userAnswers->get($question->id);
+
+            if ($userAnswer && $correctAnswer) {
+                if ($question->type === 'multiple_choice') {
+                    $results[$question->id] = (int) $userAnswer->answer === (int) $correctAnswer->id;
+                } else {
+                    $results[$question->id] = strtolower(trim($userAnswer->answer)) === strtolower(trim($correctAnswer->content));
+                }
+
+                if ($results[$question->id]) {
+                    $correctCount++;
+                }
+            } else {
+                $results[$question->id] = false;
             }
-        } else {
-            // Si el usuario no respondió la pregunta, consideramos como incorrecta
-            $results[$question->id] = false;
         }
-    }
-    
-    // Calcular la cantidad de respuestas correctas
-    $correctCount = count(array_filter($results));
-    
-    // Pasar los datos a la vista
-    return view('web.exams.results', compact('exam', 'userExam', 'userAnswers', 'results', 'correctCount'));
-}
 
-    
-    
+        return view('web.exams.results', compact('exam', 'userExam', 'userAnswers', 'results', 'correctCount'));
+    }
 }
 
 

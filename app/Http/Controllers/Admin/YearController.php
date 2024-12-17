@@ -49,26 +49,31 @@ class YearController extends Controller
      * Display the specified resource.
      */
     public function show(Year $year)
-{
-    $year->load('semesters', 'students');
+    {
+        $year->load('semesters', 'students');
 
-    foreach ($year->semesters as $semester) {
-        $startDate = Carbon::parse($semester->start_date);
-        $endDate = Carbon::parse($semester->end_date);
-        $period = CarbonPeriod::create($startDate, $endDate);
+        foreach ($year->semesters as $semester) {
+            $startDate = Carbon::parse($semester->start_date);
+            $endDate = Carbon::parse($semester->end_date);
+            $period = CarbonPeriod::create($startDate, $endDate);
 
-        $businessDays = 0;
-        foreach ($period as $date) {
-            if ($date->isWeekday()) {
-                $businessDays++;
+            $businessDays = 0;
+            foreach ($period as $date) {
+                if ($date->isWeekday()) {
+                    $businessDays++;
+                }
             }
+            $semester->business_days = $businessDays;
         }
-        $semester->business_days = $businessDays;
+
+        return view('admin.years.show', compact('year'));
     }
-
-    return view('admin.years.show', compact('year'));
-}
-
+    
+    public function getSemesters($yearId)
+    {
+        $year = Year::with('semesters')->findOrFail($yearId); // Carga los semestres relacionados
+        return response()->json($year->semesters);
+    }
     
 
     /**

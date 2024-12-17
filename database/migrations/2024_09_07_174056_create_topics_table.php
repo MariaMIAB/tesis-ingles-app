@@ -15,10 +15,9 @@ return new class extends Migration {
             $table->string('topic_name');
             $table->text('topic_description');
             $table->unsignedBigInteger('semester_id');
-            $table->timestamps();
-            $table->softDeletes();
-
             $table->foreign('semester_id')->references('id')->on('semesters')->onDelete('cascade');
+            $table->softDeletes();
+            $table->timestamps();
         });
     }
 

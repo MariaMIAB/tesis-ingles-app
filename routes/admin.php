@@ -33,7 +33,6 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
         'years' => YearController::class,
         'semesters' => SemesterController::class,
         'topics' => TopicController::class,
-      
         'activities' => ActivityController::class,
         'exams' => ExamController::class,
         'options' => OptionController::class,
@@ -56,13 +55,12 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     });
     
     Route::get('contents/create/{topic_id}', [ContentController::class, 'create'])->name('contents.create');
+    Route::get('/api/years/{year}/semesters', [YearController::class, 'getSemesters']);
 
     //semestre
     Route::post('/semesters/storeOrUpdate/{year}', [SemesterController::class, 'storeOrUpdate'])->name('semesters.storeOrUpdate');
     Route::get('/semesters/create/{id}', [SemesterController::class, 'create'])->name('semesters.create');
-
     Route::get('topics/{topicId}/contents', [ContentController::class, 'index'])->name('topics.contents.index');
-    Route::get('api/years/{year}/semesters', [TopicController::class, 'getSemestersByYear']);
 
     // Rutas de tablas
     Route::get('api/dbusers', [UserController::class, 'datatables']);
@@ -82,6 +80,7 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
     Route::post('/topics/{topic}/view', [TopicController::class, 'storeView'])->name('topics.view');
     Route::post('/topics/{topic}/like', [TopicController::class, 'storeLike'])->name('topics.like');
 
+    //rutas para la papapelera
     Route::get('trash', [TrashController::class, 'index'])->name('trash.index');
 
     // Rutas para usuarios

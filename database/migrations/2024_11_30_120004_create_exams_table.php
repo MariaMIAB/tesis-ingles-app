@@ -19,8 +19,11 @@ class CreateExamsTable extends Migration
             $table->text('description')->nullable();
             $table->enum('type', ['true_false', 'short_answer', 'multiple_choice', 'varied']);
             $table->foreignId('topic_id')->constrained('topics')->onDelete('cascade');
-            $table->boolean('visible')->default(false);
+            $table->unsignedBigInteger('semester_id');
+            $table->foreign('semester_id')->references('id')->on('semesters')->onDelete('cascade');
+            $table->boolean('visibility')->default(false);
             $table->integer('duration');
+            $table->dateTime('published_at')->nullable();
             $table->timestamps();
         });
     }

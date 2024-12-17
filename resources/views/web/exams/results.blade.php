@@ -19,24 +19,33 @@
 
                 <!-- Mostrar puntaje con estilo mejorado -->
                 <div class="alert alert-info text-center animated fadeIn">
-                    <strong class="puntaje">Puntaje: </strong> <span class="puntaje-number">{{ $score }}</span>   
-                    <strong class="correctas">Respuestas correctas:</strong> <span class="correctas-number">{{$correctCount}} / {{ $exam->questions->count() }}</span>
+                    <strong class="puntaje">Puntaje:</strong> <span class="puntaje-number">{{ $score }}%</span>
+                    <strong class="correctas">Respuestas correctas:</strong> <span class="correctas-number">{{ $correctCount }} / {{ $exam->questions->count() }}</span>
                 </div>
 
                 <!-- Listar las preguntas y respuestas -->
                 <div id="questions-section">
                     @foreach ($exam->questions as $index => $question)
                         <div class="question mb-4" id="question-{{ $question->id }}">
-                            <div class="d-flex align-items-center" style="justify-content: space-between;">
+                            <div class="d-flex align-items-center justify-content-between">
                                 <h5><span class="text-primary">{{ $index + 1 }}.</span> {{ $question->content }}</h5>
 
-                                <!-- Mensaje Correcto o Incorrecto al mismo nivel que la pregunta -->
+                                <!-- Mensaje Correcto o Incorrecto -->
+                                @php
+                                    $isCorrect = isset($userAnswers[$question->id]) && 
+                                        ($question->type === 'multiple_choice' ? 
+                                            (int) $userAnswers[$question->id]->answer === (int) $correctAnswers[$question->id]->id :
+                                            strtolower(trim($userAnswers[$question->id]->answer)) === strtolower(trim($correctAnswers[$question->id]->content)));
+                                @endphp
+
                                 @if(isset($userAnswers[$question->id]))
-                                    @if($userAnswers[$question->id]->answer == $correctAnswers[$question->id]->content)
+                                    @if($isCorrect)
                                         <span class="badge badge-success animated fadeIn">Correcto</span>
                                     @else
                                         <span class="badge badge-danger animated fadeIn">Incorrecto</span>
                                     @endif
+                                @else
+                                    <span class="badge badge-warning animated fadeIn">No respondida</span>
                                 @endif
                             </div>
 
@@ -45,9 +54,9 @@
                                 <div class="options">
                                     @foreach ($question->options as $option)
                                         <div class="form-check">
-                                            <label class="form-check-label">
+                                            <label class="form-check-label @if($option->is_correct) text-success font-weight-bold @endif">
                                                 <input type="radio" class="form-check-input" disabled
-                                                    @if($userAnswers[$question->id]->answer == $option->id) checked @endif>
+                                                    @if(isset($userAnswers[$question->id]) && (int) $userAnswers[$question->id]->answer === $option->id) checked @endif>
                                                 {{ $option->content }}
                                             </label>
                                         </div>
@@ -55,23 +64,24 @@
                                 </div>
                             @elseif ($question->type === 'true_false')
                                 <div class="form-check">
-                                    <label class="form-check-label">
+                                    <label class="form-check-label @if($correctAnswers[$question->id]->content === 'true') text-success font-weight-bold @endif">
                                         <input type="radio" class="form-check-input" disabled
-                                            @if($userAnswers[$question->id]->answer == 'true') checked @endif>
+                                            @if(isset($userAnswers[$question->id]) && $userAnswers[$question->id]->answer === 'true') checked @endif>
                                         Verdadero
                                     </label>
                                 </div>
 
                                 <div class="form-check">
-                                    <label class="form-check-label">
+                                    <label class="form-check-label @if($correctAnswers[$question->id]->content === 'false') text-success font-weight-bold @endif">
                                         <input type="radio" class="form-check-input" disabled
-                                            @if($userAnswers[$question->id]->answer == 'false') checked @endif>
+                                            @if(isset($userAnswers[$question->id]) && $userAnswers[$question->id]->answer === 'false') checked @endif>
                                         Falso
                                     </label>
                                 </div>
                             @elseif ($question->type === 'short_answer')
                                 <div class="form-check">
-                                    <textarea class="form-control" disabled>{{ $userAnswers[$question->id]->answer }}</textarea>
+                                    <textarea class="form-control" disabled>{{ $userAnswers[$question->id]->answer ?? '' }}</textarea>
+                                    <small class="text-success">Respuesta correcta: {{ $correctAnswers[$question->id]->content }}</small>
                                 </div>
                             @endif
                         </div>
@@ -88,7 +98,6 @@
 
 @section('css')
     <style>
-        /* Estilo para el Puntaje */
         .puntaje {
             font-size: 1.2em;
             font-weight: bold;
@@ -115,7 +124,6 @@
             text-shadow: 2px 2px 5px rgba(0, 123, 255, 0.3);
         }
 
-        /* Resaltar respuestas correctas */
         .badge-success {
             background-color: #28a745;
             color: white;
@@ -124,7 +132,6 @@
             animation: bounceIn 0.5s ease-out;
         }
 
-        /* Resaltar respuestas incorrectas */
         .badge-danger {
             background-color: #dc3545;
             color: white;
@@ -133,7 +140,13 @@
             animation: shake 0.5s ease-out;
         }
 
-        /* Animación para "Correcto" y "Incorrecto" */
+        .badge-warning {
+            background-color: #ffc107;
+            color: white;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
         @keyframes bounceIn {
             0% {
                 transform: scale(0);
@@ -166,12 +179,10 @@
             }
         }
 
-        /* Estilo para las respuestas */
         .form-check {
             margin-bottom: 10px;
         }
 
-        /* Efecto fadeIn al cargar */
         .animated.fadeIn {
             animation: fadeIn 2s ease-in-out;
         }
@@ -200,4 +211,5 @@
             });
         });
     </script>
-@endsection
+@stop
+

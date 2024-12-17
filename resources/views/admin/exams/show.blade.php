@@ -24,9 +24,25 @@
                 </div>
                 <hr class="custom-hr">
                 <div class="d-flex">
-                    <span><strong>Tipo de Examen:</strong> <span>{{ $exam->type }}</span></span>
+                    <span><strong>Tipo de Examen:</strong> <span>{{ ucfirst(str_replace('_', ' ', $exam->type)) }}</span></span>
                     <span class="ml-3"><strong>Visible:</strong> <span>{{ $exam->visible ? 'Sí' : 'No' }}</span></span>
                     <span class="ml-3"><strong>Duración:</strong> <span>{{ $exam->duration }} minutos</span></span>
+                </div>
+                <hr class="custom-hr">
+                <div class="d-flex">
+                    <span><strong>Año:</strong> 
+                        <span>
+                            @if($exam->semester && $exam->semester->year)
+                                {{ $exam->semester->year->name }} ({{ $exam->semester->year->start_date }} - {{ $exam->semester->year->end_date }})
+                            @else
+                                No asignado
+                            @endif
+                        </span>
+                    </span>
+                </div>
+                <hr class="custom-hr">
+                <div class="d-flex">
+                    <span><strong>Semestre:</strong> <span>{{ $exam->semester->name }}</span></span>
                 </div>
                 <hr class="custom-hr">
             </div>
@@ -35,8 +51,8 @@
                 <p><strong>Tema:</strong> <span>{{ $exam->topic->topic_name }}</span></p>
                 <hr class="custom-hr">
                 <div class="d-flex">
-                    <span><strong>Fecha de Creación:</strong> <span>{{ $exam->created_at }}</span></span>
-                    <span class="ml-3"><strong>Última Actualización:</strong> <span>{{ $exam->updated_at }}</span></span>
+                    <span><strong>Fecha de Creación:</strong> <span>{{ $exam->created_at->format('d/m/Y H:i') }}</span></span>
+                    <span class="ml-3"><strong>Última Actualización:</strong> <span>{{ $exam->updated_at->format('d/m/Y H:i') }}</span></span>
                 </div>
             </div>
         </div>
@@ -48,8 +64,14 @@
         <h3 class="text-primary">Preguntas del Examen</h3>
         <hr class="custom-hr">
         @if($exam->questions->isEmpty())
-            <p>No hay preguntas disponibles para este examen.</p>
-            <a class="btn btn-success" href="{{ route('questions.create', $exam) }}">Agregar Preguntas</a>
+            <div class="alert alert-warning text-center">
+                <strong>No hay preguntas disponibles para este examen.</strong>
+                <div class="mt-3">
+                    <a class="btn btn-success btn-lg" href="{{ route('questions.create', $exam) }}">
+                        <i class="fas fa-plus"></i> Agregar Preguntas
+                    </a>
+                </div>
+            </div>
         @else
             <div class="card questions-container">
                 <div class="card-body questions-scroll">
@@ -76,8 +98,14 @@
     </div>
 </div>
 
-<a class="btn btn-secondary mt-3" href="{{ route('exams.index') }}">Atrás</a>
-<a class="btn btn-primary mt-3" href="{{ route('questions.edit', $exam) }}">Editar preguntas</a>
+<div class="d-flex justify-content-between mt-4">
+    <a class="btn btn-secondary" href="{{ route('exams.index') }}">
+        <i class="fas fa-arrow-left"></i> Atrás
+    </a>
+    <a class="btn btn-primary" href="{{ route('questions.edit', $exam) }}">
+        <i class="fas fa-edit"></i> Editar preguntas
+    </a>
+</div>
 
 @stop
 
@@ -189,19 +217,24 @@
             box-shadow: none;
         }
 
-        @keyframes square-in-center {
-            from {
-                clip-path: inset(100% 100% 100% 100%);
-            }
-            to {
-                clip-path: inset(0 0 0 0);
-            }
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+
+        .btn-lg {
+            font-size: 1.25rem;
+            padding: 10px 20px;
+        }
+
+        .d-flex.justify-content-between a {
+            padding: 10px 20px;
         }
 
         [transition-style="in:square:center"] {
             animation: 1.5s cubic-bezier(.25, 1, .30, 1) square-in-center both;
         }
-        
     </style>
 @stop
 

@@ -39,6 +39,7 @@
         </div>
     </div>
 @endsection
+
 <!-- SweetAlert2 CDN -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -55,14 +56,15 @@
     </script>
 @endif
 
-
 <style>
+    /* Contenedor de los temas */
     .topics-container {
         max-width: 1600px;
         margin: 0 auto;
         padding: 20px;
     }
 
+    /* Título de la página */
     .page-title {
         font-size: 2.5rem;
         font-weight: bold;
@@ -71,24 +73,27 @@
         text-align: center;
     }
 
+    /* Estilo general de las cards */
     .card {
         margin: 20px;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-        transition: 0.3s;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
         border-radius: 10px;
         height: 350px;
         display: flex;
         flex-direction: column;
-        background-color: #f0f8ff;
-        position: relative;
+        background-color: #f9f9f9;
         overflow: hidden;
+        position: relative;
     }
 
+    /* Hover de las cards */
     .card-dm:hover {
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
         transform: scale(1.05);
     }
 
+    /* Estilo del cuerpo de las cards */
     .card-body {
         padding: 20px;
         display: flex;
@@ -96,13 +101,15 @@
         justify-content: space-between;
     }
 
+    /* Títulos de las cards */
     .topic-title {
-        font-size: 1.2rem;
-        font-weight: 600;
+        font-size: 1.4rem;
+        font-weight: bold;
         color: #333;
         margin-bottom: 10px;
     }
 
+    /* Línea decorativa */
     .custom-hr {
         border: 0;
         height: 2px;
@@ -110,6 +117,7 @@
         margin: 15px 0;
     }
 
+    /* Línea principal */
     .custom-hr2 {
         border: 3px solid #007bff;
         height: 10px;
@@ -121,8 +129,11 @@
         border-radius: 5px;
     }
 
+    /* Descripción de las cards */
     .card-text {
         flex-grow: 1;
+        color: #555;
+        font-size: 1rem;
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
@@ -130,6 +141,7 @@
         -webkit-box-orient: vertical;
     }
 
+    /* Badges para actividades y exámenes */
     .card-activities,
     .card-exams {
         font-size: 0.9rem;
@@ -137,11 +149,6 @@
         padding: 5px 10px;
         border-radius: 5px;
         text-align: center;
-        display: inline-block;
-        max-width: 50%;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
     }
 
     .card-activities {
@@ -150,7 +157,7 @@
     }
 
     .card-exams {
-        background-color: #ff0077;
+        background-color: #28a745;
         color: white;
     }
 
@@ -164,21 +171,19 @@
         color: white;
     }
 
-    .card-exams .badge {
-        font-size: 0.8rem;
-    }
-
+    /* Cards con actividades vacías */
     .no-activities {
-        border: 2px solid red;
+        border: 2px dashed #dc3545;
     }
 
+    /* Transiciones y animaciones */
     .card-link {
         text-decoration: none;
         color: inherit;
     }
 
     .card-link:hover .card-dm {
-        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
         transform: scale(1.05);
     }
 </style>
