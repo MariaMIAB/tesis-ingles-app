@@ -38,7 +38,7 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
         'options' => OptionController::class,
         'user-answers' => UserAnswerController::class
     ]);
-
+    Route::get('/activities/scorm/{id}', [ActivityController::class, 'viewScorm'])->name('activities.scorm');
     // Rutas específicas con exclusiones
     Route::resource('questions', QuestionController::class)->except(['create', 'store']);
     Route::resource('contents', ContentController::class)->except(['create']);
@@ -82,6 +82,7 @@ Route::group(['middleware' => ['role:Administrador|Profesor']], function () {
 
     //rutas para la papapelera
     Route::get('trash', [TrashController::class, 'index'])->name('trash.index');
+    Route::get('/admin/panel/filter-semester-data', [PanelController::class, 'filterSemesterData'])->name('admin.panel.filterSemesterData');
 
     // Rutas para usuarios
     Route::prefix('users')->group(function () {

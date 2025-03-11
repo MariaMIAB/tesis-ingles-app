@@ -25,64 +25,6 @@
             </table>
         </div>
     </div>
-    <h3 class="text-green font-weight-bold">Roles y Usuarios</h3>
-
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h2>Exanenes-cancelados</h2>
-                    @if(isset($usersByRole['Exanenes-cancelados']) && $usersByRole['Exanenes-cancelados']->isNotEmpty())
-                        @foreach($usersByRole['Exanenes-cancelados'] as $user)
-                            <div class="list-group-item">
-                                <label for="">{{ $user->name }}</label>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="list-group-item">
-                            <label for="">No hay usuarios con este rol.</label>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h2>Actividades-cancelados</h2>
-                    @if(isset($usersByRole['Actividades-cancelados']) && $usersByRole['Actividades-cancelados']->isNotEmpty())
-                        @foreach($usersByRole['Actividades-cancelados'] as $user)
-                            <div class="list-group-item">
-                                <label for="">{{ $user->name }}</label>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="list-group-item">
-                            <label for="">No hay usuarios con este rol.</label>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h2>Contenidos-cancelados</h2>
-                    @if(isset($usersByRole['Contenidos-cancelados']) && $usersByRole['Contenidos-cancelados']->isNotEmpty())
-                        @foreach($usersByRole['Contenidos-cancelados'] as $user)
-                            <div class="list-group-item">
-                                <label for="">{{ $user->name }}</label>
-                            </div>
-                        @endforeach
-                    @else
-                        <div class="list-group-item">
-                            <label for="">No hay usuarios con este rol.</label>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
 @stop
 
 @section('css')

@@ -85,6 +85,8 @@
         background-color: #f9f9f9;
         overflow: hidden;
         position: relative;
+        will-change: opacity, transform;
+        animation-fill-mode: forwards;
     }
 
     /* Hover de las cards */
@@ -186,21 +188,46 @@
         box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
         transform: scale(1.05);
     }
+    /* Estilo del footer para asegurarlo */
+    footer {
+        position: relative;
+        z-index: 10;
+        padding: 20px 0;
+        background: #007bff;
+        color: white;
+        text-align: center;
+        font-size: 1rem;
+    }
+
+    footer a {
+        color: #ffc107;
+        text-decoration: none;
+    }
+
+    footer a:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const cards = document.querySelectorAll('.card');
+        const footer = document.querySelector('footer');
+
+        // Aseguramos que el footer no sea bloqueado
+        if (footer) {
+            footer.style.position = 'relative';
+            footer.style.zIndex = '10';
+        }
+
         cards.forEach((card, index) => {
             card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
+            card.style.transform = 'translateY(50px)'; // Desde arriba del footer
+            card.style.transition = `opacity 0.7s ease, transform 0.7s ease ${index * 0.2}s`;
             setTimeout(() => {
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
-            }, index * 100);
+            }, index * 200);
         });
     });
 </script>
-
-

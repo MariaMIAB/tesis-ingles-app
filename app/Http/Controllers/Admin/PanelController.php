@@ -4,62 +4,85 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Models\Exam;
+use App\Models\Activity;
+use App\Models\Semester;
+use App\Models\Topic;
+use App\Models\TopicLike;
+use App\Models\TopicView;
+use App\Models\Year;
 
 class PanelController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Muestra el panel de administración con datos generales.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('admin.panel');
+        // Datos generales
+        $totalUsers = User::count();
+        $totalExams = Exam::count();
+        $totalActivities = Activity::count();
+        $totalTopics = Topic::count();
+        $totalSemesters = Semester::count();
+        $totalLikes = TopicLike::count();
+        $totalViews = TopicView::count();
+    
+        // Obtener los años disponibles basados en la tabla "years"
+        $availableYears = Year::pluck('name', 'id'); 
+        
+        // Obtener el año seleccionado desde la vista o el más reciente por defecto
+        $selectedYearId = $request->input('year', Year::orderBy('name', 'desc')->first()->id);
+    
+        // Obtener los datos por semestre para el año seleccionado
+        $formattedSemesterData = $this->getSemesterData($selectedYearId);
+    
+        // Obtener los temas con más vistas y más likes
+        $mostViewedTopics = Topic::withCount('views')
+            ->orderByDesc('views_count')
+            ->take(5)
+            ->get(['id', 'topic_name']);
+    
+        $mostLikedTopics = Topic::withCount('likes')
+            ->orderByDesc('likes_count')
+            ->take(5)
+            ->get(['id', 'topic_name']);
+    
+        // Pasar las variables a la vista
+        return view('admin.panel', compact(
+            'totalUsers', 'totalExams', 'totalActivities', 'totalTopics', 
+            'totalSemesters', 'totalLikes', 'totalViews', 'mostViewedTopics', 'mostLikedTopics',
+            'formattedSemesterData', 'availableYears', 'selectedYearId'
+        ));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Devuelve los datos por semestre en formato JSON para el filtrado dinámico.
      */
-    public function create()
+    public function filterSemesterData(Request $request)
     {
-        //
+        $yearId = $request->input('year_id');
+        $formattedSemesterData = $this->getSemesterData($yearId);
+        return response()->json($formattedSemesterData);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Obtiene los datos formateados de semestres de acuerdo con el año proporcionado.
      */
-    public function store(Request $request)
+    private function getSemesterData($yearId)
     {
-        //
-    }
+        $semesters = Semester::where('year_id', $yearId)->get();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        return $semesters->map(function ($semester) {
+            $topics = $semester->topics()->withCount(['exams', 'activities'])->get();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            return [
+                'semester' => $semester->name,
+                'topics' => $topics->count(),
+                'exams' => $topics->sum('exams_count'),
+                'activities' => $topics->sum('activities_count')
+            ];
+        });
     }
 }

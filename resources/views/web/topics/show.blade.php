@@ -9,14 +9,12 @@
                     <div class="buttons ml-auto">
                         <form action="{{ route('topics.view', $topic->id) }}" method="POST">
                             @csrf
-                            <!-- Verificación de si el usuario ya ha visto el tema -->
                             <button type="submit" class="btn {{ Auth::user()->views->contains('topic_id', $topic->id) ? 'btn-info' : 'btn-secondary' }}">
                                 <i class="fas fa-eye{{ Auth::user()->views->contains('topic_id', $topic->id) ? '' : '-slash' }}"></i>
                             </button>
                         </form>
                         <form action="{{ route('topics.like', $topic->id) }}" method="POST">
                             @csrf
-                            <!-- Verificación de si el usuario ha dado like al tema -->
                             <button type="submit" class="btn {{ Auth::user()->likes->contains('topic_id', $topic->id) ? 'btn-primary' : 'btn-secondary' }}">
                                 <i class="fas fa-thumbs-{{ Auth::user()->likes->contains('topic_id', $topic->id) ? 'up' : 'down' }}"></i>
                             </button>
@@ -26,7 +24,7 @@
                 <hr class="custom-hr-title">
             </div>
             <p class="page-description">{{ $topic->topic_description }}</p>
-            <div class="col-md-7">
+            <div class="col-md-8">
                 @foreach($topic->contents as $content)
                     <div class="card card-dm">
                         <div class="card-body">
@@ -36,8 +34,8 @@
                                 </div>
                                 <div class="col-2">
                                     <audio id="audio-player-{{ $content->id }}" src="{{ url('/text-to-speech/' . $content->id) }}" type="audio/mpeg"></audio>
-                                    <button onclick="toggleAudio({{ $content->id }})" id="audio-button-{{ $content->id }}" class="btn btn-primary"> 
-                                        <i class="fas fa-play"></i> 
+                                    <button onclick="toggleAudio({{ $content->id }})" id="audio-button-{{ $content->id }}" class="btn btn-primary">
+                                        <i class="fas fa-play"></i>
                                     </button>
                                 </div>
                             </div>
@@ -61,127 +59,109 @@
                 @endforeach
             </div>
 
-            <div class="col-md-5">
+            <div class="col-md-4 accordion" id="dynamicAccordion">
+
                 <!-- Exámenes Relacionados -->
-                <h4 class="section-title">Exámenes Relacionados</h4>
-                <div class="related-contents">
-                    @forelse($topic->exams as $exam)
-                        @if ($exam->visibility)  <!-- Verificación de si el examen está visible -->
-                            <div class="card card-dm exam-card {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'exam-completed' : '' }}" 
-                                onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-10">
-                                            <h5 class="card-title exam-title">{{ $exam->title }}</h5>
-                                            <p class="card-text exam-description">{{ $exam->description }}</p>
-                                        </div>
-                                        <div class="col-2 text-right">
-                                            <span class="badge badge-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'success' : 'warning' }} exam-status">
-                                                <i class="fas fa-{{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'check-circle' : 'hourglass-half' }}"></i> 
-                                                {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'Realizado' : 'Pendiente' }}
-                                            </span>
-                                        </div>
-                                    </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingExams">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExams" aria-expanded="true" aria-controls="collapseExams">
+                            Exámenes Relacionados
+                        </button>
+                    </h2>
+                    <div id="collapseExams" class="accordion-collapse collapse show" aria-labelledby="headingExams" data-bs-parent="#dynamicAccordion">
+                        <div class="accordion-body">
+                            <div class="related-contents">
+                                <div class="cards-wrapper">
+                                    @forelse($topic->exams as $exam)
+                                        @if ($exam->visibility)
+                                            <div class="card card-dm exam-card {{ Auth::user()->examsTaken->contains('id', $exam->id) ? 'exam-completed' : '' }}" 
+                                                onclick="window.location.href='{{ route('exam.show', $exam->id) }}'">
+                                                <div class="card-body">
+                                                    <h5 class="card-title exam-title">{{ $exam->title }}</h5>
+                                                    <p class="card-text exam-description">{{ $exam->description }}</p>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @empty
+                                        <p>No hay exámenes disponibles.</p>
+                                    @endforelse
                                 </div>
-                            </div>
-                        @else
-                            <!-- Mostrar mensaje si el examen no está visible -->
-                            <div class="card card-dm">
-                                <div class="card-body">
-                                    <h5 class="card-title exam-title">{{ $exam->title }}</h5>
-                                    <p>Este examen no está disponible en este momento.</p>
-                                </div>
-                            </div>
-                        @endif
-                    @empty
-                        <div class="card card-dm">
-                            <div class="card-body">
-                                <p>No hay exámenes relacionados.</p>
                             </div>
                         </div>
-                    @endforelse
+                    </div>
                 </div>
-            
-                <hr class="custom-hr">
             
                 <!-- Actividades Relacionadas -->
-                <h4 class="section-title">Actividades Relacionadas</h4>
-                <div class="related-contents">
-                    @forelse($topic->activities as $activity)
-                        <!-- Hacemos que toda la tarjeta sea clickeable -->
-                        <a href="{{ route('activitiesu.show', $activity->id) }}" class="card card-dm activity-card clickable-card">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-10">
-                                        <h5 class="card-title activity-title">{{ $activity->title }}</h5>
-                                        <p class="card-text activity-description">{{ $activity->description }}</p>
-                                    </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingActivities">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseActivities" aria-expanded="false" aria-controls="collapseActivities">
+                            Actividades Relacionadas
+                        </button>
+                    </h2>
+                    <div id="collapseActivities" class="accordion-collapse collapse" aria-labelledby="headingActivities" data-bs-parent="#dynamicAccordion">
+                        <div class="accordion-body">
+                            <div class="related-contents">
+                                <div class="cards-wrapper">
+                                    @forelse($topic->activities as $activity)
+                                        <a href="{{ route('activitiesu.show', $activity->id) }}" class="card card-dm activity-card clickable-card">
+                                            <div class="card-body">
+                                                <h5 class="card-title activity-title">{{ $activity->title }}</h5>
+                                                <p class="card-text activity-description">{{ $activity->description }}</p>
+                                            </div>
+                                        </a>
+                                    @empty
+                                        <p>No hay actividades disponibles.</p>
+                                    @endforelse
                                 </div>
                             </div>
-                        </a>
-                    @empty
-                        <div class="card card-dm">
-                            <div class="card-body">
-                                <p>No hay actividades relacionadas.</p>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Noticias Recomendadas -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingNews">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseNews" aria-expanded="false" aria-controls="collapseNews">
+                            Noticias Recomendadas
+                        </button>
+                    </h2>
+                    <div id="collapseNews" class="accordion-collapse collapse" aria-labelledby="headingNews" data-bs-parent="#dynamicAccordion">
+                        <div class="accordion-body">
+                            <div class="recommended-articles">
+                                @foreach($recommendations as $recommendation)
+                                    <a href="{{ $recommendation->url }}" target="_blank" class="card card-dm clickable-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title exam-title">{{ $recommendation->title }}</h5>
+                                            <p class="card-text">{{ $recommendation->summary }}</p>
+                                        </div>
+                                    </a>
+                                @endforeach
                             </div>
                         </div>
-                    @endforelse
+                    </div>
                 </div>
-            </div>            
+            
+            </div>
             
         </div>
-        
-        <!-- Botón atrás -->
+
         <div class="col-md-12 text-center mt-5">
-            <a href="{{ route('topicsu.index') }}" class="btn btn-secondary">Atrás</a>
+            <a href="{{ route('topics.index') }}" class="btn btn-primary">Volver a los Temas</a>
         </div>
     </div>
 @endsection
 
+
 <style>
 
-    /* Hacer que la tarjeta sea clickeable */
-    .clickable-card {
-        display: block;  /* Aseguramos que el enlace ocupe todo el espacio de la tarjeta */
-        cursor: pointer; /* Cambiar el cursor al pasar sobre la tarjeta */
-        text-decoration: none; /* Quitar el subrayado por defecto de los enlaces */
-        transition: transform 0.3s ease, box-shadow 0.3s ease; /* Añadir transiciones suaves */
-    }
-
-    /* Efecto de hover para la tarjeta */
-    .clickable-card:hover {
-        transform: translateY(-5px); /* Mover ligeramente la tarjeta hacia arriba */
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra para indicar interactividad */
-    }
-
-    /* Estilo para el título y la descripción */
-    .activity-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: #333;
-    }
-
-    .activity-description {
-        font-size: 1rem;
-        color: #555;
-    }
-
-    /* Ajuste para la columna de la derecha con el badge */
-    .activity-status {
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: #fff;
-        background-color: #007bff;
-    }
-
-
+    /* Estilos generales */
     .topics-container {
         max-width: 1600px;
         margin: 0 auto;
         padding: 20px;
     }
 
+    /* Estilos de la página */
     .page-title {
         font-size: 2.5rem;
         font-weight: bold;
@@ -215,14 +195,19 @@
         border-radius: 5px;
     }
 
+    /* Estilos de la tarjeta */
     .card {
-        margin: 20px 40px; /* Aumentado para separar las tarjetas de los costados */
+        margin: 20px 40px;
         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
         transition: 0.3s;
         border-radius: 10px;
         height: auto;
         display: flex;
         flex-direction: column;
+    }
+
+    .card-dm {
+        transition: transform 0.3s ease-in-out;
     }
 
     .card-dm:hover {
@@ -235,6 +220,26 @@
         line-height: 1.6;
     }
 
+    .card-body > div {
+        margin-bottom: 15px;
+    }
+
+    /* Estilos de la imagen */
+    .content-image {
+        max-width: 200px;
+        padding: 5px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 2px solid #007bff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .content-images img {
+        padding: 5px;
+    }
+
+    /* Estilos del texto */
     .content-title {
         font-size: 1.2rem;
         font-weight: 600;
@@ -250,31 +255,67 @@
         -webkit-box-orient: vertical;
     }
 
+    .activity-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #333;
+    }
+
+    .activity-description {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .activity-status {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background-color: #007bff;
+    }
+
+    /* Estilos de la tarjeta clickeable */
+    .clickable-card {
+        display: block;
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .clickable-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Estilos del contenido relacionado */
     .related-contents {
         border-left: 5px solid #007bff;
         padding-left: 20px;
         border-radius: 10px 0 0 10px;
-        background-color: #f8f9fa;
+        background-color: rgba(255, 255, 255, 0); /* Usamos un color con transparencia */
+        position: relative;
     }
 
-    .content-images img {
-        padding: 5px;
+    .related-contents .cards-wrapper {
+        opacity: 1; /* Mantén la opacidad del contenido dentro de los cards */
     }
 
-    .card-body > div {
-        margin-bottom: 15px;
+
+    .related-contents .card-dm {
+        background-color: #f8f9fa; /* Fondo claro */
+        border: 1px solid #ddd; /* Borde suave */
+        border-radius: 10px; /* Bordes redondeados */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        opacity: 1;  /* Los cards no tienen opacidad, están totalmente visibles */
     }
 
-    .content-image {
-        max-width: 200px;
-        padding: 5px;
-        margin-top: 15px;
-        margin-bottom: 15px;
-        border-radius: 5px;
-        border: 2px solid #007bff;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    .related-contents .card-dm:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
 
+    /* Ajustes para diferentes dispositivos */
     @media (max-width: 768px) {
         .col-md-7, .col-md-5 {
             flex: 100%;
@@ -283,10 +324,26 @@
         }
     }
 
-    .card-dm {
-        transition: transform 0.3s ease-in-out;
+    /* Estilos del footer */
+    .footer {
+        background-color: #007bff;
+        color: white;
+        padding: 20px 0;
+        text-align: center;
+        border-top: 5px solid #0056b3; /* Separador del contenido */
     }
 
+    .footer a {
+        color: #f8f9fa;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Estilos del tema */
     .topic-header {
         display: flex;
         align-items: center;
@@ -296,6 +353,8 @@
         display: flex;
         gap: 10px;
     }
+
+    /* Estilos de la tarjeta de examen */
     .exam-card {
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -315,18 +374,54 @@
         color: #28a745;
     }
 
+    /* Contraste de las tarjetas en actividades y exámenes */
+    .exam-card, .activity-card {
+        background-color: #ffffff;
+        border: 1px solid #cccccc;
+    }
+
+    .exam-card .exam-title,
+    .activity-card .activity-title {
+        color: #007bff;
+        font-weight: bold;
+    }
+
     .badge {
         font-size: 0.9rem;
         padding: 5px 10px;
         border-radius: 12px;
     }
+
+    .exam-card:hover, .activity-card:hover {
+        background-color: #f0f8ff;
+    }
+    .recommended-articles {
+        border-left: 5px solid #007bff;
+        padding-left: 20px;
+        border-radius: 10px 0 0 10px;
+        background-color: rgba(255, 255, 255, 0.9);
+        position: relative;
+    }
+
+    .recommended-articles .card-dm {
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .recommended-articles .card-dm:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+    .accordion-collapse {
+        transition: height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    }
+
 </style>
 
-
-<!-- Include Bootstrap and SweetAlert scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- SweetAlert integration -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 
@@ -361,7 +456,15 @@
         });
     </script>
 @endif
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let accordionButtons = document.querySelectorAll(".accordion-button");
 
-
-
-
+        accordionButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                let targetCollapse = document.querySelector(button.getAttribute("data-bs-target"));
+                let bsCollapse = new bootstrap.Collapse(targetCollapse, { toggle: true });
+            });
+        });
+    });
+</script>

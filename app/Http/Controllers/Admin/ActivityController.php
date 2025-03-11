@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Activity;
 use App\Models\Topic;
 use App\Traits\Trashable;
+use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class ActivityController extends Controller
 {
@@ -16,7 +18,7 @@ class ActivityController extends Controller
     public function datatables()
     {
         $query = Activity::with('topic');
-    
+
         return DataTables::eloquent($query)
             ->addColumn('topic_name', function (Activity $activity) {
                 return $activity->topic->name;
@@ -26,47 +28,68 @@ class ActivityController extends Controller
             ->toJson();
     }
 
-    // Listar todas las actividades
     public function index()
     {
         $activities = Activity::with('topic')->get();
         return view('admin.activities.index', compact('activities'));
     }
 
-    // Mostrar el formulario para crear una nueva actividad
     public function create()
     {
         $topics = Topic::all();
         return view('admin.activities.create', compact('topics'));
     }
 
-    // Almacenar una nueva actividad
     public function store(Request $request)
     {
-        // Validar los datos
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'link' => 'required|url',
             'status' => 'boolean',
             'topic_id' => 'required|exists:topics,id',
+            'scorm_file' => 'nullable|mimes:zip',
+            'link' => 'nullable|url',
         ]);
 
-        // Crear la actividad
-        Activity::create($request->all());
+        $scormPath = null;
+        if ($request->hasFile('scorm_file')) {
+            $file = $request->file('scorm_file');
+            $folderName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $destinationPath = public_path("scorm/$folderName");
 
-        return redirect()->route('activities.index')->with('success', 'Actividad creada exitosamente');
+            $zip = new ZipArchive;
+            if ($zip->open($file->path()) === TRUE) {
+                $zip->extractTo($destinationPath);
+                $zip->close();
+                $scormPath = "scorm/$folderName/index.html";
+            } else {
+                return back()->with('error', 'No se pudo descomprimir el archivo SCORM.');
+            }
+        }
+
+        Activity::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'link' => $scormPath ?? $request->link,
+            'status' => $request->status ?? true,
+            'topic_id' => $request->topic_id,
+        ]);
+
+        return redirect()->route('activities.index')->with('success', 'Actividad creada exitosamente.');
     }
 
-    // Mostrar una actividad específica
     public function show($id)
     {
         $activity = Activity::with('topic')->findOrFail($id);
-        $embedLink = str_replace("/content/", "/content/", $activity->link . "/embed");
+    
+        // Verificar si el enlace es una URL externa o un archivo local
+        $embedLink = filter_var($activity->link, FILTER_VALIDATE_URL) ? $activity->link : asset($activity->link);
+    
         return view('admin.activities.show', compact('activity', 'embedLink'));
     }
+    
 
-    // Mostrar el formulario para editar una actividad existente
+
     public function edit($id)
     {
         $activity = Activity::findOrFail($id);
@@ -74,49 +97,53 @@ class ActivityController extends Controller
         return view('admin.activities.edit', compact('activity', 'topics'));
     }
 
-    // Actualizar una actividad existente
     public function update(Request $request, Activity $activity)
     {
-        // Validar los datos
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'link' => 'required|url',
             'status' => 'boolean',
             'topic_id' => 'required|exists:topics,id',
+            'scorm_file' => 'nullable|mimes:zip',
+            'link' => 'nullable|url',
         ]);
 
-        // Actualizar la actividad
-        $activity->update($request->all());
+        if ($request->hasFile('scorm_file')) {
+            if ($activity->link && str_contains($activity->link, 'scorm')) {
+                $oldFolder = public_path(dirname($activity->link));
+                if (is_dir($oldFolder)) {
+                    Storage::deleteDirectory($oldFolder);
+                }
+            }
 
-        return redirect()->route('activities.index')->with('success', 'Actividad actualizada exitosamente');
+            $file = $request->file('scorm_file');
+            $folderName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $destinationPath = public_path("scorm/$folderName");
+
+            $zip = new ZipArchive;
+            if ($zip->open($file->path()) === TRUE) {
+                $zip->extractTo($destinationPath);
+                $zip->close();
+                $scormPath = "scorm/$folderName/index.html";
+            } else {
+                return back()->with('error', 'No se pudo descomprimir el archivo SCORM.');
+            }
+        }
+
+        $activity->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'status' => $request->status ?? true,
+            'topic_id' => $request->topic_id,
+            'link' => $scormPath ?? $request->link,
+        ]);
+
+        return redirect()->route('activities.index')->with('success', 'Actividad actualizada exitosamente.');
     }
 
-    // Eliminar una actividad existente
     public function destroy(Activity $activity)
     {
         $activity->delete();
-        return redirect()->route('activities.index')->with('success', 'Actividad eliminada exitosamente');
-    }
-
-    public function moveToTrash($id)
-    {
-        $activity = Activity::findOrFail($id);
-        $activity->delete();
-        return redirect()->route('trash.index')->with('success', 'Actividad movida a la papelera.');
-    }
-
-    public function restoreFromTrash($id)
-    {
-        $activity = Activity::onlyTrashed()->findOrFail($id);
-        $activity->restore();
-        return redirect()->route('trash.index')->with('success', 'Actividad restaurada desde la papelera.');
-    }
-
-    public function forceDeleteFromTrash($id)
-    {
-        $activity = Activity::onlyTrashed()->findOrFail($id);
-        $activity->forceDelete();
-        return redirect()->route('trash.index')->with('success', 'Actividad eliminada permanentemente.');
+        return redirect()->route('activities.index')->with('success', 'Actividad eliminada exitosamente.');
     }
 }

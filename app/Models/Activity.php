@@ -24,6 +24,24 @@ class Activity extends Model
     {
         return $this->belongsTo(Topic::class);
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_activity')
+                    ->withPivot('score', 'max_score', 'percentage')
+                    ->withTimestamps();
+    }
+    
+    public function year()
+    {
+        return $this->belongsTo(Year::class);
+    }
+
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
 }
 
 

@@ -27,11 +27,23 @@ Route::get('lang/{locale}', function ($locale) {
 
 Route::get('/topicsu', [TopicController::class, 'index'])->name('topicsu.index');
 Route::get('/topicsu/{id}', [TopicController::class, 'show'])->name('topicsu.show');
-Route::get('/activitiesu/{id}', [ActivityController::class, 'show'])->name('activitiesu.show');
+
 Route::get('/text-to-speech/{contentId}', [ElevenLabsController::class, 'textToSpeech']);
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/activitiesu/{id}', [ActivityController::class, 'show'])->name('activitiesu.show');
+    Route::post('/store-user-activity', [ActivityController::class, 'store'])->name('store.user.activity');
+
+});
+
 Route::get('/exam/{exam}', [UserExamController::class, 'show'])->name('exam.show');
 Route::post('/exam/{exam}', [UserExamController::class, 'submit'])->name('exam.submit');
 Route::get('/exam/{exam_id}/results', [UserExamController::class, 'showResults'])->name('exam.results');
+
+
+
 
 
 

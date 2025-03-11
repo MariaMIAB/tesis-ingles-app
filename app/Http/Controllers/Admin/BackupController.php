@@ -25,11 +25,23 @@ class BackupController extends Controller
         return view('admin.backups.index', compact('statuses', 'backups'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         try {
-            Artisan::call('backup:run');
-            return redirect()->route('backups.index')->with('success', 'Backup creado exitosamente.');
+            $type = $request->input('type');
+
+            if ($type === 'database') {
+                Artisan::call('backup:run --only-db');
+                $message = 'Backup de la base de datos creado exitosamente.';
+            } elseif ($type === 'files') {
+                Artisan::call('backup:run --only-files');
+                $message = 'Backup del sistema creado exitosamente.';
+            } else {
+                Artisan::call('backup:run');
+                $message = 'Backup completo creado exitosamente.';
+            }
+
+            return redirect()->route('backups.index')->with('success', $message);
         } catch (\Exception $e) {
             Log::error('Error al crear el backup: ' . $e->getMessage());
             return redirect()->route('backups.index')->with('error', 'Error al crear el backup.');
@@ -38,15 +50,26 @@ class BackupController extends Controller
 
     public function download(Request $request)
     {
+        $request->validate(['path' => 'required|string']);
+
         $path = $request->input('path');
         $disk = Storage::disk('google');
-        $file = $disk->get($path);
-        $mimeType = $disk->mimeType($path);
-        $fileName = basename($path);
-    
-        return response($file, 200)
-            ->header('Content-Type', $mimeType)
-            ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
+
+        if (!$disk->exists($path)) {
+            return redirect()->route('backups.index')->with('error', 'El archivo no existe.');
+        }
+
+        try {
+            $file = $disk->get($path);
+            $fileName = basename($path);
+            $mimeType = 'application/octet-stream';
+
+            return response($file, 200)
+                ->header('Content-Type', $mimeType)
+                ->header('Content-Disposition', "attachment; filename=\"$fileName\"");
+        } catch (\Exception $e) {
+            Log::error('Error al descargar el backup: ' . $e->getMessage());
+            return redirect()->route('backups.index')->with('error', 'No se pudo descargar el archivo.');
+        }
     }
-    
 }

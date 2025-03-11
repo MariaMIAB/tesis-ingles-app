@@ -5,7 +5,7 @@
 @section('content_header')
     <div class="card bg-success">
         <div class="card-header">
-            <h1 class="text-white font-weight-bold" style="border-bottom: 4px solid white;">Lista de estudiantes del Año</h1>
+            <h1 class="text-white font-weight-bold" style="border-bottom: 4px solid white;">Lista de Estudiantes del Año</h1>
         </div>
     </div>
 @stop
@@ -21,65 +21,111 @@
                         <strong>Fecha de Fin:</strong> <span>{{ $year->end_date }}</span>
                     </p>
                     <hr class="custom-hr">
-                    <h3>Semestres</h3>
-                    @if($year->semesters->isEmpty())
-                        <p>No hay semestres registrados para este año.</p>
-                    @else
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Nombre del Semestre</th>
-                                    <th>Fecha de Inicio</th>
-                                    <th>Fecha de Fin</th>
-                                    <th>Días Hábiles</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($year->semesters as $semester)
-                                    <tr>
-                                        <td>{{ $semester->name }}</td>
-                                        <td>{{ $semester->start_date }}</td>
-                                        <td>{{ $semester->end_date }}</td>
-                                        <td>{{ $semester->business_days }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    @endif
-                    <hr class="custom-hr">
                     <h3>Estudiantes y Notas</h3>
-                    @if($year->students->isEmpty())
-                        <p>No hay estudiantes registrados para este año.</p>
+
+                    @if($students->isEmpty())
+                        <p class="text-warning">No hay estudiantes registrados para este año.</p>
                     @else
-                        <table class="table table-bordered">
-                            <thead>
+                        <div class="legend">
+                            <span><i class="fas fa-tasks"></i> Actividades</span>
+                            <span><i class="fas fa-file-alt"></i> Exámenes</span>
+                            <span><i class="fas fa-percentage"></i> Total</span>
+                            <span><i class="fas fa-chart-line"></i> Nota Estimada</span>
+                            <span><i class="fas fa-award"></i> Promedio Final</span>
+                            <span><i class="fas fa-graduation-cap"></i> Nota Final Estimada</span>
+                        </div>
+
+                        <table class="table table-bordered text-center table-hover table-striped">
+                            <thead class="thead-dark">
                                 <tr>
-                                    <th>Nombre</th>
-                                    <th>Email</th>
-                                    <th>Primer Trimestre</th>
-                                    <th>Segundo Trimestre</th>
-                                    <th>Tercer Trimestre</th>
+                                    <th>Estudiante</th>
+                                    @foreach($year->semesters as $semester)
+                                        <th colspan="4" class="text-center">{{ $semester->name }}</th>
+                                    @endforeach
+                                    <th>Promedio Final</th>
+                                    <th>Nota Final Estimada</th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    @foreach($year->semesters as $semester)
+                                        <th><i class="fas fa-tasks"></i></th>
+                                        <th><i class="fas fa-file-alt"></i></th>
+                                        <th><i class="fas fa-percentage"></i></th>
+                                        <th><i class="fas fa-chart-line"></i></th>
+                                    @endforeach
+                                    <th><i class="fas fa-award"></i></th>
+                                    <th><i class="fas fa-graduation-cap"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($year->students as $student)
+                                @foreach($students as $student)
                                     <tr>
-                                        <td>{{ $student->name }}</td>
-                                        <td>{{ $student->email }}</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
+                                        <td class="font-weight-bold">{{ $student->name }}</td>
+                                        @php 
+                                            $totalFinal = 0; 
+                                            $countFinal = 0; 
+                                            $finalEstimated = $studentScores[$student->id]['final_estimated'] ?? 0;
+                                        @endphp
+
+                                        @foreach($year->semesters as $semester)
+                                            @php
+                                                $scores = $studentScores[$student->id][$semester->id] ?? null;
+                                                $activity = $scores['activities'] ?? null;
+                                                $exam = $scores['exams'] ?? null;
+                                                $total = $scores['total'] ?? null;
+                                                $estimated = $scores['estimated'] ?? 0;
+
+                                                $activityColor = $activity !== null ? ($activity < 50 ? 'text-danger' : 'text-success') : 'text-warning';
+                                                $examColor = $exam !== null ? ($exam < 50 ? 'text-danger' : 'text-success') : 'text-warning';
+                                                $totalColor = $total !== null ? ($total < 50 ? 'text-danger' : 'text-success') : 'text-warning';
+                                                $estimatedColor = $estimated < 50 ? 'text-danger' : 'text-success';
+
+                                                if ($total !== null) {
+                                                    $totalFinal += $total;
+                                                    $countFinal++;
+                                                }
+                                            @endphp
+                                            
+                                            <td class="font-weight-bold {{ $activityColor }}">
+                                                {{ $activity !== null ? number_format($activity, 2) : '-' }}
+                                            </td>
+
+                                            <td class="font-weight-bold {{ $examColor }}">
+                                                {{ $exam !== null ? number_format($exam, 2) : '-' }}
+                                            </td>
+
+                                            <td class="font-weight-bold {{ $totalColor }}">
+                                                {{ $total !== null ? number_format($total, 2) : '-' }}
+                                            </td>
+
+                                            <td class="font-weight-bold {{ $estimatedColor }}">
+                                                {{ number_format($estimated, 2) }}
+                                            </td>
+                                        @endforeach
+
+                                        <td class="font-weight-bold text-primary">
+                                            @if ($countFinal === count($year->semesters))
+                                                {{ number_format($totalFinal / $countFinal, 2) }}
+                                            @elseif ($countFinal > 0)
+                                                <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Notas incompletas</span>
+                                            @else
+                                                <span class="text-danger"><i class="fas fa-times-circle"></i> Sin notas</span>
+                                            @endif
+                                        </td>
+
+                                        <td class="font-weight-bold text-info">
+                                            {{ number_format($finalEstimated, 2) }}
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     @endif
-                </div>
-            </div>
-        </div>
-    </div>
-@stop
-
+                </div>                                 
+            </div>  
+        </div>                    
+    </div>  
+@stop  
 
 @section('css')
     <style>
@@ -91,37 +137,32 @@
             background-color: #f8f9fa;
         }
 
-        p {
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        .font-weight-bold {
             font-size: 1.1em;
         }
 
-        strong {
-            color: #343a40;
+        .text-danger {
+            color: #dc3545 !important;
         }
 
-        .img-fluid {
-            max-width: 100%;
-            height: auto;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        .text-success {
+            color: #28a745 !important;
         }
 
-        .img-fluid:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(0, 128, 0, 1);
-            border-color: rgba(0, 128, 0, 1);
+        .text-primary {
+            color: #007bff !important;
         }
 
-        .shadow {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .text-warning {
+            color: #ffc107 !important;
         }
 
-        .d-flex {
-            display: flex;
-            align-items: center;
-        }
-
-        .ml-3 {
-            margin-left: 1rem;
+        .text-info {
+            color: #17a2b8 !important;
         }
 
         .custom-hr {
@@ -131,6 +172,7 @@
             box-shadow: 0 0 10px rgba(0, 128, 0, 0.75);
             margin: 1rem 0;
         }
+
         .custom-dates {
             font-weight: bold;
             color: #333;
@@ -139,10 +181,21 @@
         .custom-dates span {
             margin-right: 10px;
         }
+
+        .legend {
+            margin-bottom: 15px;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .legend span {
+            margin-right: 15px;
+        }
     </style>
 @stop
 
 @section('js')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
     @if(session('success'))
     <script>
         Swal.fire({
@@ -154,4 +207,4 @@
         });
     </script>
     @endif
-@stop
+@stop  

@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Storage as FacadesStorage;
+use Illuminate\Support\Facades\URL;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
         $this->loadGoogleDriver();
+        if (config('app.env') !== 'local') { // Solo en producción
+            URL::forceScheme('https');
+        }
     }
 
     private function loadGoogleDriver(){

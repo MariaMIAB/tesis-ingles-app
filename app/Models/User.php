@@ -136,6 +136,7 @@ class User extends Authenticatable implements HasMedia
     {
         return $this->belongsToMany(Semester::class, 'student_semester', 'student_id', 'semester_id');
     }
+    
 
     public function views()
     {
@@ -152,8 +153,18 @@ class User extends Authenticatable implements HasMedia
         return $this->belongsToMany(Exam::class, 'user_exams')->withPivot('score')->withTimestamps();
     }
 
-}
-
-
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class, 'user_exams')
+                    ->withPivot('score')
+                    ->withTimestamps();
+    }
     
+    public function activities()
+    {
+        return $this->belongsToMany(Activity::class, 'user_activity')
+                    ->withPivot('score', 'status', 'started_at', 'completed_at')
+                    ->withTimestamps();
+    }
 
+}
