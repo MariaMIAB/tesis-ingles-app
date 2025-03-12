@@ -17,6 +17,43 @@
                 <h2 class="text-center animated fadeIn">Resultados del Examen</h2>
                 <p class="text-muted text-center">Has completado el examen <strong>{{ $exam->title }}</strong></p>
 
+                @if(isset($attemptResults) && count($attemptResults) > 0)
+                    <div class="card mt-4">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0">Tus últimos intentos</h4>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered text-center">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Nota</th>
+                                        <th>Correctas</th>
+                                        <th>Resultado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($attemptResults as $index => $attempt)
+                                        <tr class="{{ $attempt['is_best'] ? 'table-success' : '' }}">
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $attempt['score'] }}%</td>
+                                            <td>{{ $attempt['correctCount'] ?? '-' }}</td> <!-- Evitar error si falta correctCount -->
+                                            <td>
+                                                @if ($attempt['is_best'])
+                                                    <span class="badge bg-success">Mejor intento 🎉</span>
+                                                @else
+                                                    <span class="badge bg-secondary">Intento previo</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endif
+
+<br>
                 <!-- Mostrar puntaje con estilo mejorado -->
                 <div class="alert alert-info text-center animated fadeIn">
                     <strong class="puntaje">Puntaje:</strong> <span class="puntaje-number">{{ $score }}%</span>
@@ -212,4 +249,3 @@
         });
     </script>
 @stop
-

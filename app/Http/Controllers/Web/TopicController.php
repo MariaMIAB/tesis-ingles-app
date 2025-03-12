@@ -14,14 +14,26 @@ class TopicController extends Controller
         return view('web.topics.index', compact('topics'));
     }
     
-    public function show($id)
+    public function show($id) 
     {
         $topic = Topic::with(['contents', 'activities'])->findOrFail($id);
         $searchQuery = $topic->topic_name;
         $recommendations = $this->fetchAcademicContent($searchQuery);
 
+        // Procesar cada contenido para corregir la URL de las imágenes
+        foreach ($topic->contents as $content) {
+            if ($content->hasMedia('content_images')) {
+                $content->image_urls = $content->getMedia('content_images')->map(function ($image) {
+                    return str_replace('http://localhost', '', $image->getUrl()); // Ajusta la ruta
+                });
+            } else {
+                $content->image_urls = collect(['/storage/imagenes/sistema/alt-de-una-imagen.png']);
+            }
+        }
+
         return view('web.topics.show', compact('topic', 'recommendations'));
     }
+
     
     /**
      * Busca contenido académico basado en un título de tema.

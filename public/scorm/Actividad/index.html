@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="es">
+<head>
+<link rel="stylesheet" type="text/css" href="base.css" />
+<link rel="stylesheet" type="text/css" href="content.css" />
+<link rel="stylesheet" type="text/css" href="nav.css" />
+<meta http-equiv="content-type" content="text/html;  charset=utf-8" />
+<title>Maria </title>
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+<meta name="author" content="mari" />
+<link rel="license" type="text/html" href="http://creativecommons.org/licenses/by-sa/4.0/" />
+<meta name="generator" content="eXeLearning 2.9 - exelearning.net" />
+<meta name="description" content="practica de para tesis" />
+<!--[if lt IE 9]><script type="text/javascript" src="exe_html5.js"></script><![endif]-->
+<script type="text/javascript" src="exe_jquery.js"></script>
+<script type="text/javascript" src="common_i18n.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<link rel="stylesheet" type="text/css" href="candado-activity.css" />
+<script type="text/javascript" src="candado-activity.js"></script>
+<link rel="stylesheet" type="text/css" href="desafio-activity.css" />
+<script type="text/javascript" src="desafio-activity.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body class="exe-web-site" id="exe-node-0"><script type="text/javascript">document.body.className+=" js"</script>
+<div id="content">
+<p id="skipNav"><a href="#main" class="sr-av">Saltar la navegación</a></p>
+<header id="header" ><div id="headerContent">Maria</div></header>
+<nav id="siteNav">
+<ul>
+   <li id="active"><a href="index.html" class="active no-ch main-node">Actividad</a></li>
+</ul>
+</nav>
+<div id='topPagination'>
+<nav class="pagination noprt">
+
+</nav>
+</div>
+<div id="main-wrapper">
+<section id="main">
+<header id="nodeDecoration"><h1 id="nodeTitle">Actividad</h1></header>
+<article class="iDevice_wrapper ClozeIdevice em_iDevice em_iDevice_question" id="id0">
+<div class="iDevice emphasis1" >
+<header class="iDevice_header"><h1 class="iDeviceTitle">Rellenar huecos</h1></header>
+<div class="iDevice_inner">
+<div class="iDevice_content_wrapper">
+<section id="ta0_116" class="block instructions iDevice_content">
+Lea el párrafo que aparece abajo y complete las palabras que faltan.
+</section>
+
+    <section class="activity" id="activity-0_117"><form name="cloze-form-0_117" action="#" class="activity-form cloze-activity-form"><div id="cloze0_117"><input type="hidden" name="clozeFlag0_117.strictMarking" id="clozeFlag0_117.strictMarking" value="false"/>
+<input type="hidden" name="clozeFlag0_117.checkCaps" id="clozeFlag0_117.checkCaps" value="false"/>
+<input type="hidden" name="clozeFlag0_117.instantMarking" id="clozeFlag0_117.instantMarking" value="false"/>
+<div class="block iDevice_buttons"><p><input class="button" type="submit" name="submit0_117" value="Enviar"  id="submit0_117" />
+<input type="button" name="restart0_117" value="Reiniciar" style="display:none" id="restart0_117" onclick="$exe.cloze.restart('0_117')" />
+ <input type="button" name="0_117showAnswersButton" value="Mostrar las respuestas" style="display:none" id="showAnswersButton0_117" onclick="$exe.cloze.fillInputs('0_117')" />
+<span class="js-hidden js-warning">Habilitar JavaScript</span></p></div><div id="clozeScore0_117"></div></div></form></section></div>
+</div>
+</div>
+</article>
+<article class="iDevice_wrapper textIdevice" id="id1">
+<div class="iDevice emphasis0" >
+<div id="ta1_133_2" class="block iDevice_content">
+
+</div>
+</div>
+</article>
+<article class="iDevice_wrapper candadoIdevice em_iDevice" id="id12">
+<div class="iDevice emphasis1" >
+<header class="iDevice_header iDevice_header_noIcon"><h1 class="iDeviceTitle">Candado</h1></header>
+<div class="iDevice_inner">
+<div class="iDevice_content_wrapper">
+<div id="ta12_143_2" class="block iDevice_content">
+
+</div>
+</div>
+</div>
+</div>
+</article>
+<article class="iDevice_wrapper desafioIdevice em_iDevice" id="id13">
+<div class="iDevice emphasis1" >
+<header class="iDevice_header iDevice_header_noIcon"><h1 class="iDeviceTitle">Desafío</h1></header>
+<div class="iDevice_inner">
+<div class="iDevice_content_wrapper">
+<div id="ta13_144_2" class="block iDevice_content">
+
+</div>
+</div>
+</div>
+</div>
+</article>
+<article class="iDevice_wrapper QuizTestIdevice em_iDevice em_iDevice_question" id="id14">
+<script type="text/javascript">/*<![CDATA[*/
+var numQuestions = 2;
+var rawScore = 0;
+var actualScore = 0;
+var question0;
+var question1;
+var key0 = 0;
+var key1 = 0;
+function getAnswer()
+        {
+            for (var i=0; i < 2; i++)
+            {
+               if (document.getElementById("quizForm14").key0b14[i].checked)
+               {
+                  question0 = document.getElementById("quizForm14").key0b14[i].value;
+                  break;
+               }
+            }
+            
+            for (var i=0; i < 2; i++)
+            {
+               if (document.getElementById("quizForm14").key1b14[i].checked)
+               {
+                  question1 = document.getElementById("quizForm14").key1b14[i].value;
+                  break;
+               }
+            }
+            }
+        function calcRawScore(){
+
+            if (question0 == key0)
+            {
+               rawScore++;
+            }
+            if (question1 == key1)
+            {
+               rawScore++;
+            }
+        
+        }
+        
+        function calcScore2()
+        {
+            getAnswer();
+     
+            calcRawScore();
+            actualScore =  Math.round(rawScore / numQuestions * 100);
+            var id = "14";
+            document.getElementById("quizForm"+id).submitB.disabled = true;
+            var s = document.getElementById("quizFormScore"+id);
+                        var msg_str ="Su puntuación es %d%%";            msg_str = msg_str.replace("%d",actualScore).replace("%%","%");            if (s) { s.innerHTML = "<div class='feedback'><p>"+msg_str+"</p></div>"; } else { alert(msg_str); }
+           
+        }
+    /*]]>*/</script>
+<div class="iDevice emphasis1" >
+<header class="iDevice_header"><h1 class="iDeviceTitle">Cuestionario SCORM</h1></header>
+<div class="iDevice_inner">
+<div class="iDevice_content_wrapper">
+<form name="quizForm14" id="quizForm14" action="#" class="quiz-test-form">
+<input type="hidden" name="passrate" id="passrate-14" value="50" />
+<section class="question">
+<h1 class="js-sr-av">Pregunta</h1>
+<div id="taquestion0b14" class="block iDevice_content">
+<p>que es el color</p>
+</div>
+<section class="iDevice_answers">
+<h1 class="js-sr-av">Respuestas</h1>
+<section class="iDevice_answer">
+<p class="iDevice_answer-field js-required">
+<label for="key0b141" class="sr-av"><a href="#answer-key0b141">Opción 1</a></label><input type="radio" name="key0b14" id="key0b141" value="0" />
+</p>
+<div class="iDevice_answer-content" id="answer-key0b141">
+<div id="taoptionAnswer0q0b14" class="block iDevice_content">
+<p>es onda de luz variable</p>
+</div>
+</div>
+</section>
+<section class="iDevice_answer">
+<p class="iDevice_answer-field js-required">
+<label for="key0b142" class="sr-av"><a href="#answer-key0b142">Opción 2</a></label><input type="radio" name="key0b14" id="key0b142" value="1" />
+</p>
+<div class="iDevice_answer-content" id="answer-key0b142">
+<div id="taoptionAnswer1q0b14" class="block iDevice_content">
+<p>es un tinte</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section class="question">
+<h1 class="js-sr-av">Pregunta</h1>
+<div id="taquestion1b14" class="block iDevice_content">
+<p>cuál es el sentido de la vida</p>
+</div>
+<section class="iDevice_answers">
+<h1 class="js-sr-av">Respuestas</h1>
+<section class="iDevice_answer">
+<p class="iDevice_answer-field js-required">
+<label for="key1b141" class="sr-av"><a href="#answer-key1b141">Opción 1</a></label><input type="radio" name="key1b14" id="key1b141" value="0" />
+</p>
+<div class="iDevice_answer-content" id="answer-key1b141">
+<div id="taoptionAnswer0q1b14" class="block iDevice_content">
+<p>reproducirse</p>
+</div>
+</div>
+</section>
+<section class="iDevice_answer">
+<p class="iDevice_answer-field js-required">
+<label for="key1b142" class="sr-av"><a href="#answer-key1b142">Opción 2</a></label><input type="radio" name="key1b14" id="key1b142" value="1" />
+</p>
+<div class="iDevice_answer-content" id="answer-key1b142">
+<div id="taoptionAnswer1q1b14" class="block iDevice_content">
+<p>sobrevivir y joder</p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<div class="block iDevice_buttons">
+<p><input type="submit" name="submitB" value="ENVIAR RESPUESTAS" /> <span class="js-hidden js-warning">Habilitar JavaScript</span></p>
+</div>
+<div id="quizFormScore14"></div>
+</form>
+</div>
+</div>
+</div>
+</article>
+<div id="packageLicense" class="cc cc-by-sa">
+<p><span>Obra publicada con</span> <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Licencia Creative Commons Reconocimiento Compartir igual 4.0</a></p>
+</div>
+</section>
+</div>
+<div id='bottomPagination'>
+<nav class="pagination noprt">
+
+</nav>
+</div>
+</div>
+<p id="made-with-eXe"><a href="https://exelearning.net/" target="_blank" rel="noopener"><span>Creado con eXeLearning<span> (Ventana nueva)</span></span></a></p><script type="text/javascript" src="_intef_js.js"></script></body></html>

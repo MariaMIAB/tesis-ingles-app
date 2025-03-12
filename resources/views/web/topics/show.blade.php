@@ -41,19 +41,17 @@
                             </div>
                             <hr class="custom-hr-content">
                             <div class="row">
-                                <div class="col-8">
-                                    <p class="card-text">{!! $content->body !!}</p>
+                                <div class="col-12">
+                                    <p class="card-text text-justify">{!! $content->body !!}</p>
                                 </div>
-                                <div class="col-4 content-images">
-                                    @if ($content->hasMedia('content_images'))
-                                        @foreach($content->getMedia('content_images') as $image)
-                                            <img src="{{ $content->first_content_image_url }}" class="content-image" alt="Imagen del Contenido">
-                                        @endforeach
-                                    @else
-                                        <img src="{{ asset('/storage/imagenes/sistema/alt-de-una-imagen.png') }}" class="content-image" alt="Imagen por defecto">
-                                    @endif
+                                <div class="col-12 text-center">
+                                    @foreach($content->image_urls as $imageUrl)
+                                        <img src="{{ $imageUrl }}" class="content-image" alt="Imagen del Contenido">
+                                    @endforeach
                                 </div>
+                                
                             </div>
+                            
                         </div>
                     </div>
                 @endforeach
@@ -140,19 +138,17 @@
                         </div>
                     </div>
                 </div>
-            
             </div>
-            
-        </div>
-
-        <div class="col-md-12 text-center mt-5">
-            <a href="{{ route('topics.index') }}" class="btn btn-primary">Volver a los Temas</a>
+            <div class="col-md-12 text-center mt-5">
+                <a href="{{ route('topicsu.index') }}" class="btn btn-primary">Volver a los Temas</a>
+            </div>
         </div>
     </div>
 @endsection
 
 
 <style>
+  
 
     /* Estilos generales */
     .topics-container {
@@ -226,19 +222,24 @@
 
     /* Estilos de la imagen */
     .content-image {
-        max-width: 200px;
+        max-width: 25%; /* Antes estaba en 100px, ajusta según necesidad */
+        height: auto; /* Mantiene la proporción */
         padding: 5px;
-        margin-top: 15px;
-        margin-bottom: 15px;
+        margin-top: 10px;
+        margin-bottom: 10px;
         border-radius: 5px;
         border: 2px solid #007bff;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
     }
 
     .content-images img {
         padding: 5px;
     }
-
+    .content-image:hover {
+        transform: scale(1.55);
+    }
+    
     /* Estilos del texto */
     .content-title {
         font-size: 1.2rem;

@@ -36,8 +36,11 @@ class UserController extends Controller
         $user = new User();
         $roles = Role::get();
         $years = Year::all();
-        return view('admin.users.create', compact('user', 'roles', 'years'));
+        $currentYear = null; // Asegurar que la variable exista en la vista
+
+        return view('admin.users.create', compact('user', 'roles', 'years', 'currentYear'));
     }
+
 
     public function store(StoreRequest $request)
     {
@@ -147,5 +150,3 @@ class UserController extends Controller
         return redirect()->route('trash.index')->with('success', 'Usuario eliminado permanentemente.');
     }
 }
-
-
